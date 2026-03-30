@@ -27,10 +27,6 @@
 <!-- Paste your desktop screenshot below -->
 ![Desktop](screenshots/desktop.png)
 
-### 📦 Apps in Action
-<!-- Paste your apps/windows screenshot below -->
-![Apps](screenshots/apps.png)
-
 ### ⌨️ Terminal
 <!-- Paste your terminal screenshot below -->
 ![Terminal](screenshots/terminal.png)
