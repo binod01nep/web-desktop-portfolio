@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BinodOS 3.0 — Binod Budha</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Syne:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700;900&family=Raleway:wght@300;400;600;700&family=Fira+Code:wght@300;400;500;700&family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#04060b;--surface:#090d15;--surface2:#0e1520;--surface3:#131d2c;--surface4:#192537;
+  --border:#162238;--border2:#1e3050;--border3:#284468;
+  --green:#00ff88;--green2:#00cc6a;--green-glow:rgba(0,255,136,0.18);
+  --blue:#00d4ff;--blue-glow:rgba(0,212,255,0.14);
+  --purple:#a855f7;--purple-glow:rgba(168,85,247,0.14);
+  --red:#ff3d6b;--yellow:#ffd700;--orange:#ff8c42;--pink:#ff6ec7;
+  --text:#ddeeff;--muted:#4a6785;--muted2:#2a4060;--muted3:#1a3050;
+  --radius:16px;--radius2:10px;
+  --shadow:0 40px 120px rgba(0,0,0,0.95),0 0 0 1px rgba(0,255,136,0.04),0 0 80px rgba(0,0,0,0.6);
+  --accent:#00ff88;--accent-glow:rgba(0,255,136,0.18);
+  --dock-w:0px;--taskbar-h:44px;
+  /* Font customization */
+  --ui-font:'JetBrains Mono',monospace;
+  --ui-font-weight:400;
+  --ui-font-color:#ddeeff;
+}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+body{font-family:var(--ui-font);background:var(--bg);color:var(--ui-font-color);height:100vh;overflow:hidden;user-select:none;cursor:default;font-weight:var(--ui-font-weight);}
+
+/* ═══ BACKGROUND ═══ */
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
+#wp-layer{position:fixed;inset:0;z-index:0;pointer-events:none;transition:all .8s;}
+.grid-overlay{position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.015) 1px,transparent 1px);background-size:52px 52px;pointer-events:none;z-index:1;}
+.scanline{position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.022) 3px,rgba(0,0,0,.022) 4px);pointer-events:none;z-index:99999;animation:scanA 10s linear infinite;}
+@keyframes scanA{from{background-position:0 0}to{background-position:0 100vh}}
+.vignette{position:fixed;inset:0;background:radial-gradient(ellipse 85% 85% at 50% 50%,transparent 35%,rgba(0,0,0,.55) 100%);pointer-events:none;z-index:1;}
+.noise{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:200px;}
+
+/* ═══ LOGIN SCREEN ═══ */
+#login{position:fixed;inset:0;z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .7s cubic-bezier(.4,0,.2,1),transform .7s cubic-bezier(.4,0,.2,1);}
+#login.hide{opacity:0;transform:scale(1.07) translateY(-24px);pointer-events:none;}
+.login-bg-text{position:absolute;font-family:'Syne',sans-serif;font-size:clamp(72px,18vw,220px);font-weight:800;color:rgba(0,255,136,.018);letter-spacing:-12px;pointer-events:none;white-space:nowrap;top:50%;left:50%;transform:translate(-50%,-50%);}
+.login-time{font-size:clamp(52px,10vw,92px);font-weight:800;font-family:'Syne',sans-serif;color:var(--text);letter-spacing:-3px;line-height:1;text-shadow:0 0 100px rgba(0,255,136,.18);}
+.login-date{font-size:12px;color:var(--muted);margin-top:6px;letter-spacing:4px;text-transform:uppercase;}
+.login-card{margin-top:44px;background:rgba(9,13,21,.88);border:1px solid var(--border2);border-radius:24px;padding:38px 42px 34px;width:330px;display:flex;flex-direction:column;align-items:center;gap:20px;backdrop-filter:blur(40px);box-shadow:0 0 100px rgba(0,255,136,.06),0 48px 100px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.04);}
+.avatar-wrap{width:82px;height:82px;position:relative;}
+.avatar-ring{position:absolute;inset:-3px;border-radius:50%;background:conic-gradient(var(--green) 0deg,var(--blue) 120deg,var(--purple) 240deg,var(--green) 360deg);animation:spin 4s linear infinite;z-index:-1;}
+.avatar-ring-inner{position:absolute;inset:-1px;border-radius:50%;background:var(--surface);z-index:0;}
+.avatar-img{position:relative;z-index:1;width:82px;height:82px;border-radius:50%;background:linear-gradient(135deg,var(--surface2),var(--surface3));display:flex;align-items:center;justify-content:center;font-size:36px;overflow:hidden;}
+.avatar-img img{width:100%;height:100%;object-fit:cover;}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.login-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;color:var(--text);text-transform:uppercase;}
+.login-status{display:flex;align-items:center;gap:5px;font-size:9px;color:var(--green);letter-spacing:1.5px;}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s ease infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.login-input-wrap{position:relative;width:100%;}
+.login-input{width:100%;background:rgba(0,0,0,.55);border:1px solid var(--border2);border-radius:12px;padding:13px 46px 13px 17px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:13px;outline:none;transition:all .25s;letter-spacing:4px;}
+.login-input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(0,255,136,.1);}
+.login-input::placeholder{letter-spacing:1px;color:var(--muted2);}
+.login-eye{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--muted);cursor:pointer;font-size:16px;background:none;border:none;transition:color .15s;}
+.login-eye:hover{color:var(--text);}
+.login-btn{width:100%;background:linear-gradient(135deg,var(--green),var(--blue));color:#000;border:none;border-radius:12px;padding:13px;font-family:'Syne',sans-serif;font-size:12px;font-weight:800;letter-spacing:2px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.login-btn:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(0,255,136,.28);}
+.login-hint{font-size:9px;color:var(--muted2);letter-spacing:1px;}
+.login-error{font-size:10px;color:var(--red);min-height:14px;text-align:center;}
+
+/* ═══ DESKTOP ═══ */
+#desktop{position:fixed;left:var(--dock-w);right:0;top:0;height:calc(100vh - var(--taskbar-h));overflow:hidden;z-index:3;display:none;}
+
+/* ═══ DESKTOP ICONS GRID ═══ */
+#desktop-icons{position:absolute;left:14px;top:14px;display:grid;grid-template-columns:repeat(3,80px);grid-auto-rows:90px;gap:8px;z-index:8;pointer-events:all;}
+.dsk-icon{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;width:78px;height:88px;border-radius:12px;cursor:pointer;transition:all .18s;padding:8px 4px;}
+.dsk-icon:hover{background:rgba(0,255,136,.08);transform:scale(1.06);}
+.dsk-icon.selected{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.25);}
+.dsk-icon .dsk-ico{font-size:30px;line-height:1;}
+.dsk-icon .dsk-lbl{font-size:9px;color:var(--ui-font-color);text-align:center;letter-spacing:.3px;line-height:1.3;word-break:break-word;font-weight:var(--ui-font-weight);}
+
+/* ═══ DOCK ═══ */
+#dock{position:fixed;left:0;top:50%;transform:translateY(-50%);width:var(--dock-w);display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:2px;background:rgba(9,13,21,.9);border-right:1px solid var(--border);backdrop-filter:blur(24px);z-index:4000;}
+.di{display:flex;flex-direction:column;align-items:center;gap:2px;width:52px;height:52px;border-radius:13px;cursor:pointer;transition:all .2s cubic-bezier(.34,1.56,.64,1);position:relative;justify-content:center;}
+.di:hover{background:rgba(0,255,136,.09);transform:scale(1.14) translateX(4px);}
+.di:hover .dtip{opacity:1;transform:translateX(0);}
+.di.active-app::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--accent);}
+.di .ico{font-size:24px;line-height:1;}
+.di .dlbl{font-size:7px;color:var(--muted);font-weight:500;}
+.dtip{position:absolute;left:calc(100% + 12px);background:rgba(9,13,21,.97);border:1px solid var(--border2);border-radius:8px;padding:5px 11px;font-size:10px;color:var(--text);white-space:nowrap;opacity:0;pointer-events:none;transform:translateX(-6px);transition:all .18s;backdrop-filter:blur(20px);z-index:9999;}
+.dock-sep{width:36px;height:1px;background:var(--border);margin:3px 0;}
+
+/* ═══ TASKBAR ═══ */
+#taskbar{position:fixed;bottom:0;left:var(--dock-w);right:0;height:var(--taskbar-h);background:rgba(4,6,11,.97);backdrop-filter:blur(28px);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 14px;z-index:5000;}
+.tb-left{display:flex;align-items:center;gap:5px;flex:1;overflow:hidden;}
+.tb-brand{background:linear-gradient(135deg,var(--accent),var(--blue));color:#000;border:none;border-radius:7px;padding:4px 12px;font-family:'Syne',sans-serif;font-size:10px;font-weight:800;letter-spacing:1.5px;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.tb-brand:hover{opacity:.85;}
+.tb-div{width:1px;height:18px;background:var(--border);margin:0 3px;flex-shrink:0;}
+.tb-tabs{display:flex;gap:3px;overflow:hidden;flex:1;}
+.tb-pill{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:3px 10px;font-size:9px;cursor:pointer;transition:all .15s;white-space:nowrap;max-width:110px;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:4px;flex-shrink:0;color:var(--muted);}
+.tb-pill:hover{border-color:var(--border3);color:var(--text);}
+.tb-pill.active{border-color:var(--accent);color:var(--accent);}
+.tb-pill .pdot{width:4px;height:4px;border-radius:50%;background:currentColor;flex-shrink:0;}
+.tb-right{display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.tray{display:flex;align-items:center;gap:8px;padding:3px 9px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;}
+.tray-i{display:flex;align-items:center;gap:3px;font-size:9px;color:var(--muted);cursor:pointer;transition:color .15s;}
+.tray-i:hover{color:var(--text);}
+.tray-i i{font-size:13px;}
+.tray-i.gn{color:var(--accent);}
+.tray-i.yw{color:var(--yellow);}
+.tray-i.rd{color:var(--red);}
+#tray-clk{font-size:10px;color:var(--text);letter-spacing:.3px;white-space:nowrap;cursor:pointer;padding:3px 8px;border-radius:6px;transition:background .15s;}
+#tray-clk:hover{background:var(--surface2);}
+
+/* ═══ WIDGETS ═══ */
+.wzone{position:absolute;right:14px;top:14px;display:flex;flex-direction:column;gap:10px;width:240px;z-index:10;}
+.widget{background:rgba(9,13,21,.84);border:1px solid var(--border2);border-radius:16px;padding:14px 16px;backdrop-filter:blur(24px);transition:border-color .2s,transform .2s;}
+.widget:hover{border-color:var(--border3);transform:translateY(-1px);}
+.wt{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;font-weight:600;}
+.note-inp{width:100%;background:transparent;border:none;outline:none;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:10px;resize:none;line-height:1.9;user-select:text;cursor:text;}
+.clk-time{font-family:'Syne',sans-serif;font-size:38px;font-weight:800;color:var(--text);letter-spacing:-2px;line-height:1;}
+.clk-date{font-size:9px;color:var(--muted);margin-top:3px;letter-spacing:2px;}
+.clk-ampm{font-size:13px;color:var(--accent);font-weight:700;margin-left:3px;}
+
+/* ═══ WINDOWS ═══ */
+.win{position:absolute;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);box-shadow:var(--shadow);display:flex;flex-direction:column;animation:winPop .22s cubic-bezier(.34,1.56,.64,1);z-index:100;min-width:320px;min-height:200px;overflow:hidden;}
+@keyframes winPop{from{opacity:0;transform:scale(.91) translateY(14px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes winClose{from{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(.93) translateY(7px)}}
+.win.minimized{display:none;}
+.win.focused{border-color:var(--border3);}
+.wbar{background:linear-gradient(180deg,var(--surface2) 0%,var(--surface) 100%);border-bottom:1px solid var(--border);border-radius:var(--radius) var(--radius) 0 0;padding:10px 14px;display:flex;align-items:center;gap:10px;cursor:move;flex-shrink:0;user-select:none;}
+.wdots{display:flex;gap:6px;}
+.wd{width:12px;height:12px;border-radius:50%;border:none;cursor:pointer;transition:all .15s;position:relative;display:flex;align-items:center;justify-content:center;}
+.wd-close{background:#ff5f57;box-shadow:0 0 5px rgba(255,95,87,.3);}
+.wd-min{background:#febc2e;box-shadow:0 0 5px rgba(254,188,46,.3);}
+.wd-max{background:#28c840;box-shadow:0 0 5px rgba(40,200,64,.3);}
+.wd:hover{filter:brightness(1.2);}
+.wd .sym{font-size:6px;font-weight:900;color:rgba(0,0,0,.6);opacity:0;transition:opacity .1s;position:absolute;}
+.wd:hover .sym{opacity:1;}
+.wtitle{flex:1;text-align:center;font-size:10px;color:var(--muted);letter-spacing:.5px;}
+.wbody{flex:1;overflow:hidden;display:flex;flex-direction:column;border-radius:0 0 var(--radius) var(--radius);}
+.wscroll{flex:1;overflow-y:auto;padding:22px 26px;}
+.rhandle{position:absolute;z-index:50;}
+.rse{bottom:0;right:0;width:15px;height:15px;cursor:se-resize;}
+.re{right:0;top:12px;bottom:12px;width:5px;cursor:e-resize;}
+.rs{bottom:0;left:12px;right:12px;height:5px;cursor:s-resize;}
+.rse::after{content:'';position:absolute;right:3px;bottom:3px;width:7px;height:7px;border-right:2px solid var(--border2);border-bottom:2px solid var(--border2);}
+
+/* ═══ COMMON UI ═══ */
+.sh{font-family:'Syne',sans-serif;font-size:21px;font-weight:800;color:var(--text);letter-spacing:-.5px;}
+.ss{font-size:10px;color:var(--muted);margin-top:3px;margin-bottom:18px;}
+.tag{display:inline-flex;align-items:center;gap:3px;background:var(--surface2);border:1px solid var(--border2);border-radius:99px;padding:2px 9px;font-size:9px;color:var(--muted);margin:2px;}
+.tag.gn{border-color:rgba(0,255,136,.3);color:var(--accent);}
+.tag.bl{border-color:rgba(0,212,255,.3);color:var(--blue);}
+.tag.pp{border-color:rgba(168,85,247,.3);color:var(--purple);}
+.btn-p{background:linear-gradient(135deg,var(--accent),var(--blue));color:#000;border:none;border-radius:10px;padding:9px 20px;font-family:'Syne',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .2s;letter-spacing:.5px;}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,255,136,.22);}
+.btn-s{background:var(--surface2);color:var(--text);border:1px solid var(--border2);border-radius:10px;padding:9px 20px;font-family:'JetBrains Mono',monospace;font-size:10px;cursor:pointer;transition:all .2s;}
+.btn-s:hover{border-color:var(--accent);color:var(--accent);}
+
+/* ═══ HOME ═══ */
+.home-hero{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:start;}
+.home-av{width:100px;height:100px;border-radius:22px;overflow:hidden;border:2px solid var(--border2);flex-shrink:0;position:relative;}
+.home-av img{width:100%;height:100%;object-fit:cover;}
+.home-name{font-family:'Syne',sans-serif;font-size:27px;font-weight:800;color:var(--text);letter-spacing:-1px;line-height:1.05;}
+.home-name .ac{color:var(--accent);}
+.home-role{font-size:11px;color:var(--blue);margin-top:5px;letter-spacing:1px;}
+.home-meta{display:flex;flex-direction:column;gap:2px;margin-top:7px;}
+.home-meta-i{font-size:9px;color:var(--muted);display:flex;align-items:center;gap:5px;}
+.home-meta-i i{font-size:12px;color:var(--muted2);}
+.home-quote{margin-top:12px;padding:9px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:9px;font-size:10px;color:var(--muted);font-style:italic;border-left:3px solid var(--accent);}
+.home-btns{display:flex;gap:7px;margin-top:14px;flex-wrap:wrap;}
+.home-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;}
+.hs{background:var(--surface2);border:1px solid var(--border);border-radius:11px;padding:13px;text-align:center;transition:all .2s;}
+.hs:hover{border-color:var(--border3);transform:translateY(-2px);}
+.hs-v{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--accent);}
+.hs-l{font-size:8px;color:var(--muted);margin-top:3px;letter-spacing:1px;text-transform:uppercase;}
+
+/* ═══ ABOUT ═══ */
+.ab-lay{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.ab-card{background:var(--surface2);border:1px solid var(--border);border-radius:11px;padding:14px;}
+.ab-head{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:10px;font-weight:700;display:flex;align-items:center;gap:5px;}
+.ab-head i{font-size:12px;}
+.ab-ln{font-size:10px;color:var(--muted);line-height:2;margin-bottom:3px;}
+.ab-ln strong{color:var(--text);}
+.exp-c{background:var(--surface2);border:1px solid var(--border);border-radius:11px;padding:14px;margin-bottom:8px;transition:all .2s;position:relative;overflow:hidden;}
+.exp-c::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--accent),var(--blue));}
+.exp-c:hover{border-color:rgba(0,255,136,.2);transform:translateX(3px);}
+.exp-role{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--text);}
+.exp-place{font-size:9px;color:var(--blue);margin:2px 0;}
+.exp-date{font-size:9px;color:var(--muted2);margin-bottom:7px;}
+.exp-desc{font-size:9px;color:var(--muted);line-height:1.9;}
+.ach-i{display:flex;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);align-items:flex-start;}
+.ach-i:last-child{border-bottom:none;}
+.ach-ico{font-size:16px;flex-shrink:0;margin-top:1px;}
+.ach-txt{font-size:10px;color:var(--muted);line-height:1.7;}
+.ach-txt strong{color:var(--text);}
+.tl{position:relative;padding-left:22px;}
+.tl::before{content:'';position:absolute;left:7px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--accent),var(--blue),transparent);}
+.tl-i{position:relative;margin-bottom:18px;}
+.tl-dot{position:absolute;left:-19px;top:4px;width:9px;height:9px;border-radius:50%;background:var(--accent);border:2px solid var(--surface);box-shadow:0 0 7px rgba(0,255,136,.4);}
+.tl-c{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:10px 12px;}
+.tl-yr{font-size:8px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;}
+.tl-ttl{font-size:12px;font-weight:700;color:var(--text);margin-bottom:1px;font-family:'Syne',sans-serif;}
+.tl-sub{font-size:9px;color:var(--muted);}
+
+/* ═══ SKILLS ═══ */
+.sk-cat{margin-bottom:18px;}
+.sk-cat-t{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:9px;font-weight:600;}
+.sk-pills{display:flex;flex-wrap:wrap;gap:7px;}
+.sk-pill{display:flex;align-items:center;gap:7px;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:7px 12px;transition:all .2s;cursor:default;}
+.sk-pill:hover{border-color:var(--border3);transform:translateY(-2px);box-shadow:0 4px 18px rgba(0,0,0,.3);}
+.sk-ico{font-size:16px;}
+.sk-name{font-size:10px;color:var(--text);font-weight:500;}
+.sk-bar-w{width:100%;height:2px;background:var(--border);border-radius:99px;margin-top:6px;}
+.sk-bar{height:100%;border-radius:99px;}
+
+/* ═══ PROJECTS ═══ */
+.pj-list{display:flex;flex-direction:column;gap:10px;}
+.pj-card{background:var(--surface2);border:1px solid var(--border);border-radius:13px;padding:16px;transition:all .22s;position:relative;overflow:hidden;cursor:pointer;}
+.pj-card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,212,255,.025),transparent);opacity:0;transition:opacity .3s;}
+.pj-card:hover{border-color:rgba(0,212,255,.28);transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,212,255,.07);}
+.pj-card:hover::after{opacity:1;}
+.pj-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:9px;margin-bottom:7px;}
+.pj-ttl{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);}
+.pj-badge{font-size:8px;padding:2px 7px;border-radius:99px;font-weight:700;letter-spacing:1px;white-space:nowrap;flex-shrink:0;}
+.b-ai{background:rgba(168,85,247,.14);color:var(--purple);border:1px solid rgba(168,85,247,.28);}
+.b-web{background:rgba(0,212,255,.09);color:var(--blue);border:1px solid rgba(0,212,255,.22);}
+.b-full{background:rgba(0,255,136,.09);color:var(--accent);border:1px solid rgba(0,255,136,.22);}
+.pj-techs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px;}
+.pj-tech{font-size:8px;color:var(--muted);background:var(--surface3);border-radius:4px;padding:2px 6px;}
+.pj-desc{font-size:10px;color:var(--muted);line-height:1.8;}
+.pj-links{display:flex;gap:7px;margin-top:9px;}
+.pj-link{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:6px;background:var(--surface3);transition:all .15s;border:none;cursor:pointer;}
+.pj-link:hover{color:var(--accent);background:rgba(0,255,136,.06);}
+
+/* ═══ CERTS ═══ */
+.cert-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;}
+.cert-c{background:var(--surface2);border:1px solid var(--border);border-radius:11px;overflow:hidden;transition:all .2s;cursor:pointer;}
+.cert-c:hover{border-color:rgba(0,255,136,.22);transform:translateY(-3px);}
+.cert-img{width:100%;aspect-ratio:16/9;background:var(--surface3);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.cert-img img{width:100%;height:100%;object-fit:cover;}
+.cert-fb{font-size:36px;}
+.cert-badge{position:absolute;top:7px;right:7px;background:rgba(0,255,136,.14);border:1px solid rgba(0,255,136,.28);border-radius:99px;font-size:8px;color:var(--accent);padding:2px 7px;font-weight:700;}
+.cert-b{padding:11px 13px;}
+.cert-n{font-size:11px;font-weight:600;color:var(--text);margin-bottom:3px;line-height:1.4;}
+.cert-o{font-size:9px;color:var(--muted);}
+
+/* ═══ CONNECT ═══ */
+.conn-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.conn-c{display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:11px;padding:12px 14px;text-decoration:none;color:var(--text);transition:all .2s;}
+.conn-c:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 6px 22px rgba(0,255,136,.09);}
+.conn-c i{font-size:20px;flex-shrink:0;}
+.conn-ttl{font-size:11px;font-weight:600;color:var(--text);}
+.conn-sub{font-size:9px;color:var(--muted);margin-top:1px;}
+.ci-box{background:var(--surface2);border:1px solid var(--border);border-radius:11px;padding:14px;}
+.ci-row{display:flex;align-items:center;gap:9px;padding:5px 0;font-size:10px;color:var(--muted);border-bottom:1px solid var(--border);}
+.ci-row:last-child{border-bottom:none;}
+.ci-row i{font-size:14px;width:18px;flex-shrink:0;}
+.ci-v{color:var(--text);}
+
+/* ═══ TERMINAL ═══ */
+.term-body{flex:1;display:flex;flex-direction:column;background:#050810;border-radius:0 0 var(--radius) var(--radius);overflow:hidden;}
+.term-tabbar{display:flex;align-items:center;gap:5px;padding:5px 10px;background:#090c16;border-bottom:1px solid rgba(255,255,255,.05);}
+.term-tab{padding:3px 12px;border-radius:5px;font-size:9px;cursor:pointer;color:var(--muted);background:transparent;border:1px solid transparent;transition:all .15s;}
+.term-tab.active{background:var(--surface2);border-color:var(--border2);color:var(--text);}
+.term-out{flex:1;overflow-y:auto;padding:14px 16px 4px;font-size:11px;line-height:1.95;}
+.term-in-row{display:flex;align-items:center;gap:7px;padding:5px 16px 12px;border-top:1px solid rgba(255,255,255,.035);}
+.term-prompt{color:var(--accent);font-size:11px;white-space:nowrap;user-select:none;}
+.term-inp{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;caret-color:var(--accent);}
+.t-g{color:var(--accent)}.t-b{color:var(--blue)}.t-y{color:var(--yellow)}.t-r{color:var(--red)}.t-p{color:var(--purple)}.t-m{color:var(--muted)}.t-w{color:var(--text)}.t-bold{font-weight:700}.t-dim{opacity:.5}
+
+/* ═══ CALCULATOR ═══ */
+.calc-body{display:flex;flex-direction:column;background:#070b12;border-radius:0 0 var(--radius) var(--radius);padding:18px;gap:10px;flex:1;}
+.calc-disp{background:#050810;border:1px solid var(--border);border-radius:9px;padding:14px 16px;text-align:right;}
+.calc-hist{font-size:10px;color:var(--muted);min-height:14px;margin-bottom:3px;}
+.calc-val{font-family:'Syne',sans-serif;font-size:30px;font-weight:700;color:var(--text);letter-spacing:-1px;word-break:break-all;}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;}
+.cb{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:12px;font-family:'Syne',sans-serif;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;transition:all .15s;}
+.cb:hover{background:var(--surface3);border-color:var(--border3);}
+.cb:active{transform:scale(.96);}
+.cb.op{color:var(--blue);border-color:rgba(0,212,255,.18);}
+.cb.eq{background:linear-gradient(135deg,var(--accent),var(--blue));color:#000;border:none;}
+.cb.clr{color:var(--red);}
+.cb.wide{grid-column:span 2;}
+
+/* ═══ POMODORO ═══ */
+.pomo-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#070b12;border-radius:0 0 var(--radius) var(--radius);gap:14px;padding:24px;}
+.pomo-ring{position:relative;width:170px;height:170px;}
+.pomo-ring svg{transform:rotate(-90deg);}
+.pomo-ring-bg{fill:none;stroke:var(--border);stroke-width:7;}
+.pomo-ring-fill{fill:none;stroke-width:7;stroke-linecap:round;transition:stroke-dashoffset 1s linear;}
+.pomo-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}
+.pomo-t{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:var(--text);}
+.pomo-l{font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+.pomo-modes{display:flex;gap:5px;}
+.pomo-mb{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:4px 12px;font-size:9px;color:var(--muted);cursor:pointer;transition:all .15s;}
+.pomo-mb.active{border-color:var(--accent);color:var(--accent);}
+.pomo-ctrls{display:flex;gap:8px;}
+.pomo-cb{background:var(--surface2);border:1px solid var(--border2);border-radius:9px;padding:8px 18px;color:var(--text);font-family:'Syne',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;}
+.pomo-cb:hover{border-color:var(--accent);color:var(--accent);}
+.pomo-cb.start{background:linear-gradient(135deg,var(--accent),var(--blue));color:#000;border:none;}
+.pomo-sess{font-size:10px;color:var(--muted);display:flex;gap:5px;align-items:center;}
+.pdot{width:7px;height:7px;border-radius:50%;background:var(--border);}
+.pdot.done{background:var(--accent);}
+
+/* ═══ WEATHER APP ═══ */
+.wx-body{flex:1;display:flex;flex-direction:column;background:#070b12;border-radius:0 0 var(--radius) var(--radius);overflow-y:auto;padding:20px;}
+.wx-hero{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.wx-temp-big{font-family:'Syne',sans-serif;font-size:72px;font-weight:800;color:var(--text);letter-spacing:-4px;line-height:1;}
+.wx-icon-big{font-size:64px;}
+.wx-city{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+.wx-desc{font-size:14px;color:var(--text);margin-top:4px;font-family:'Syne',sans-serif;font-weight:600;}
+.wx-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px;}
+.wx-card{background:var(--surface2);border:1px solid var(--border);border-radius:11px;padding:13px;text-align:center;}
+.wx-card-v{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--text);}
+.wx-card-l{font-size:8px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:3px;}
+.wx-forecast{margin-top:14px;}
+.wx-fc-ttl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.wx-fc-row{display:flex;justify-content:space-between;gap:6px;}
+.wx-fc-day{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:10px 6px;text-align:center;}
+.wx-fc-day-n{font-size:8px;color:var(--muted);margin-bottom:5px;}
+.wx-fc-ico{font-size:20px;margin-bottom:4px;}
+.wx-fc-hi{font-size:12px;font-weight:700;font-family:'Syne',sans-serif;color:var(--text);}
+.wx-fc-lo{font-size:10px;color:var(--muted);}
+
+/* ═══ SETTINGS ═══ */
+.set-lay{display:grid;grid-template-columns:190px 1fr;height:100%;overflow:hidden;}
+.set-nav{background:#080c14;border-right:1px solid rgba(255,255,255,.05);padding:14px 0;overflow-y:auto;}
+.set-nav-i{display:flex;align-items:center;gap:9px;padding:8px 14px;font-size:11px;color:var(--muted);cursor:pointer;transition:all .15s;}
+.set-nav-i:hover{color:var(--text);background:rgba(255,255,255,.025);}
+.set-nav-i.active{color:var(--accent);background:rgba(0,255,136,.06);border-right:2px solid var(--accent);}
+.set-nav-i i{font-size:15px;width:17px;}
+.set-content{overflow-y:auto;padding:18px 22px;}
+.set-sec{margin-bottom:24px;}
+.set-sec-t{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:10px;font-weight:700;}
+.set-row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:9px;margin-bottom:5px;}
+.set-row-l{font-size:11px;color:var(--text);}
+.set-row-s{font-size:9px;color:var(--muted);margin-top:2px;}
+.toggle{width:38px;height:20px;border-radius:10px;background:var(--border);cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;border:none;}
+.toggle.on{background:var(--accent);}
+.toggle::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .2s;}
+.toggle.on::after{left:21px;}
+.ac-picker{display:flex;gap:7px;flex-wrap:wrap;}
+.ac-sw{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s;}
+.ac-sw:hover,.ac-sw.active{border-color:white;transform:scale(1.15);}
+.wp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:7px;}
+.wp-th{width:100%;aspect-ratio:16/9;border-radius:7px;cursor:pointer;border:2px solid transparent;transition:all .2s;overflow:hidden;position:relative;background:var(--surface3);}
+.wp-th:hover{border-color:var(--border3);transform:scale(1.02);}
+.wp-th.active{border-color:var(--accent);}
+.wp-th .wp-l{position:absolute;bottom:3px;left:0;right:0;text-align:center;font-size:7px;color:rgba(255,255,255,.7);letter-spacing:1px;}
+.wp-up{display:flex;align-items:center;gap:7px;background:var(--surface2);border:1px dashed var(--border2);border-radius:9px;padding:10px 14px;cursor:pointer;transition:all .2s;color:var(--muted);font-size:10px;width:100%;margin-top:7px;}
+.wp-up:hover{border-color:var(--accent);color:var(--accent);}
+.rng{width:110px;accent-color:var(--accent);}
+.kbd{display:inline-block;background:var(--surface3);border:1px solid var(--border2);border-radius:5px;padding:2px 7px;font-size:9px;color:var(--accent);font-family:'JetBrains Mono',monospace;}
+
+/* ═══ CONTEXT MENU ═══ */
+.ctx{position:fixed;background:rgba(9,13,21,.98);border:1px solid var(--border2);border-radius:11px;padding:5px;min-width:195px;box-shadow:0 20px 60px rgba(0,0,0,.75);z-index:9998;animation:ctxPop .1s ease;backdrop-filter:blur(28px);}
+@keyframes ctxPop{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.ctx-i{padding:7px 12px;font-size:11px;cursor:pointer;border-radius:7px;display:flex;align-items:center;gap:9px;transition:all .1s;color:var(--muted);}
+.ctx-i:hover{background:rgba(0,255,136,.07);color:var(--text);}
+.ctx-i.danger:hover{background:rgba(255,61,107,.1);color:var(--red);}
+.ctx-i i{font-size:14px;width:16px;}
+.ctx-i .ckbd{margin-left:auto;font-size:8px;color:var(--muted2);background:var(--surface3);padding:1px 5px;border-radius:3px;}
+.ctx-sep{border-top:1px solid var(--border);margin:3px 0;}
+.ctx-hd{padding:5px 12px;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted2);font-weight:600;}
+
+/* ═══ TOAST ═══ */
+#toast{position:fixed;bottom:55px;left:50%;transform:translateX(-50%) translateY(8px);background:rgba(9,13,21,.98);border:1px solid var(--accent);color:var(--accent);border-radius:9px;padding:9px 20px;font-size:11px;z-index:99998;pointer-events:none;opacity:0;transition:all .22s;white-space:nowrap;backdrop-filter:blur(20px);box-shadow:0 8px 28px rgba(0,255,136,.14);}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ═══ SPOTLIGHT ═══ */
+.sp-box{width:520px;background:rgba(9,13,21,.98);border:1px solid var(--border2);border-radius:14px;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,.85);animation:winPop .18s cubic-bezier(.34,1.56,.64,1);}
+.sp-row{display:flex;align-items:center;gap:11px;padding:14px 18px;border-bottom:1px solid var(--border);}
+.sp-row i{font-size:18px;color:var(--muted);}
+.sp-inp{flex:1;background:none;border:none;outline:none;font-size:15px;color:var(--text);font-family:'Space Grotesk',sans-serif;}
+.sp-inp::placeholder{color:var(--muted2);}
+.sp-results{max-height:300px;overflow-y:auto;}
+.sp-grp{padding:7px 10px 3px;}
+.sp-grp-l{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted2);font-weight:600;margin-bottom:3px;}
+.sp-result{display:flex;align-items:center;gap:11px;padding:8px 10px;border-radius:8px;cursor:pointer;transition:all .1s;}
+.sp-result:hover,.sp-result.sel{background:rgba(0,255,136,.07);}
+.sr-ico{font-size:18px;width:28px;text-align:center;}
+.sr-lbl{font-size:12px;color:var(--text);}
+.sr-sub{font-size:9px;color:var(--muted);margin-top:1px;}
+.sr-kbd{margin-left:auto;font-size:9px;color:var(--muted2);}
+
+/* ═══ LOGOUT MODAL ═══ */
+.logout-ov{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);z-index:20000;display:flex;align-items:center;justify-content:center;}
+.logout-modal{background:var(--surface);border:1px solid var(--border2);border-radius:18px;padding:32px 36px;text-align:center;box-shadow:var(--shadow);min-width:280px;animation:winPop .2s cubic-bezier(.34,1.56,.64,1);}
+.logout-modal h3{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:7px;}
+.logout-modal p{font-size:11px;color:var(--muted);margin-bottom:24px;line-height:1.7;}
+.logout-btns{display:flex;gap:9px;justify-content:center;}
+.btn-cancel{background:var(--surface2);color:var(--text);border:1px solid var(--border2);border-radius:9px;padding:9px 22px;font-family:'JetBrains Mono',monospace;font-size:11px;cursor:pointer;}
+.btn-cancel:hover{border-color:var(--muted);}
+.btn-logout{background:var(--red);color:#fff;border:none;border-radius:9px;padding:9px 22px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;cursor:pointer;}
+.btn-logout:hover{opacity:.85;}
+
+/* ═══ RESUME MODAL ═══ */
+.res-ov{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);z-index:20000;display:flex;align-items:center;justify-content:center;}
+.res-modal{background:var(--surface);border:1px solid var(--border2);border-radius:18px;padding:32px 36px;text-align:center;box-shadow:var(--shadow);min-width:320px;animation:winPop .2s cubic-bezier(.34,1.56,.64,1);}
+.res-modal h3{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:7px;}
+.res-modal p{font-size:11px;color:var(--muted);margin-bottom:20px;line-height:1.7;}
+.res-choices{display:flex;flex-direction:column;gap:8px;}
+.res-btn{display:flex;align-items:center;gap:12px;background:var(--surface2);border:1px solid var(--border2);border-radius:11px;padding:12px 16px;cursor:pointer;transition:all .2s;text-align:left;}
+.res-btn:hover{border-color:var(--accent);box-shadow:0 0 18px rgba(0,255,136,.09);}
+.res-btn i{font-size:20px;color:var(--accent);}
+.res-btn-l{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--text);}
+.res-btn-s{font-size:9px;color:var(--muted);margin-top:1px;}
+.res-cancel{margin-top:12px;font-size:10px;color:var(--muted2);cursor:pointer;background:none;border:none;font-family:'JetBrains Mono',monospace;}
+.res-cancel:hover{color:var(--text);}
+
+/* ═══ RESUME VIEWER ═══ */
+.rv-body{flex:1;display:flex;flex-direction:column;border-radius:0 0 var(--radius) var(--radius);background:#0a0e18;overflow:hidden;}
+.rv-tb{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;background:#090d16;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0;gap:8px;}
+.rv-btn{display:flex;align-items:center;gap:4px;background:var(--surface3);border:1px solid var(--border2);border-radius:6px;padding:4px 10px;color:var(--muted);font-size:10px;cursor:pointer;transition:all .15s;}
+.rv-btn:hover{border-color:var(--accent);color:var(--accent);}
+.rv-embed{flex:1;position:relative;overflow:hidden;}
+.rv-fallback{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#070b14;color:var(--muted);}
+.rv-fallback i{font-size:44px;color:var(--muted2);}
+.rv-fallback p{font-size:11px;line-height:1.8;text-align:center;}
+
+/* ═══ WELCOME SPLASH ═══ */
+.wsplash{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;pointer-events:none;animation:fadeOutS .8s ease 3.5s forwards;z-index:50;}
+@keyframes fadeOutS{to{opacity:0}}
+.ws-title{font-family:'Syne',sans-serif;font-size:48px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-2px;}
+.ws-sub{font-size:11px;color:var(--muted);letter-spacing:4px;text-transform:uppercase;}
+.ws-bar{width:190px;height:2px;background:var(--border);border-radius:99px;margin-top:7px;overflow:hidden;}
+.ws-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--blue));border-radius:99px;animation:loadBar 3.2s ease forwards;}
+@keyframes loadBar{from{width:0}to{width:100%}}
+.particle{position:absolute;border-radius:50%;pointer-events:none;animation:floatUp linear infinite;}
+@keyframes floatUp{0%{transform:translateY(100vh) translateX(0);opacity:0}10%{opacity:1}90%{opacity:.5}100%{transform:translateY(-100px) translateX(30px);opacity:0}}
+
+/* ═══ LOCK ═══ */
+#lock{position:fixed;inset:0;z-index:19000;background:rgba(4,6,11,.96);backdrop-filter:blur(24px);display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;}
+#lock.show{display:flex;animation:fadeIn .3s ease;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.lock-t{font-family:'Syne',sans-serif;font-size:68px;font-weight:800;color:var(--text);letter-spacing:-3px;}
+.lock-d{font-size:12px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;}
+.lock-hint{font-size:10px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;animation:pulse 2s ease infinite;}
+.lock-btn{background:var(--surface2);border:1px solid var(--border2);border-radius:11px;padding:9px 22px;color:var(--muted);font-size:11px;cursor:pointer;transition:all .2s;font-family:'JetBrains Mono',monospace;}
+.lock-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+/* ═══ CALENDAR POPUP ═══ */
+#cal-popup{position:fixed;z-index:9997;background:rgba(9,13,21,.99);border:1px solid var(--border2);border-radius:16px;padding:18px;width:280px;box-shadow:0 20px 60px rgba(0,0,0,.85);backdrop-filter:blur(28px);display:none;animation:ctxPop .15s ease;}
+#cal-popup.open{display:block;}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.cal-month-lbl{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);}
+.cal-nav{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:3px 7px;border-radius:6px;transition:all .15s;}
+.cal-nav:hover{background:var(--surface2);color:var(--text);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.cal-day-name{font-size:8px;color:var(--muted2);text-align:center;padding:3px 0;letter-spacing:.5px;}
+.cal-day{font-size:10px;color:var(--muted);text-align:center;padding:5px 2px;border-radius:6px;cursor:pointer;transition:all .12s;}
+.cal-day:hover{background:var(--surface2);color:var(--text);}
+.cal-day.today{background:var(--accent);color:#000;font-weight:700;}
+.cal-day.other-month{opacity:.3;}
+.cal-day.empty{pointer-events:none;}
+
+/* ═══ RESPONSIVE FIXES ═══ */
+
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div id="wp-layer"><div id="wp-img" style="width:100%;height:100%;background:var(--bg);background-size:cover;background-position:center;transition:all .8s;"></div></div>
+<div class="grid-overlay" id="grid-el"></div>
+<div class="scanline" id="scan-el"></div>
+<div class="vignette"></div>
+<div class="noise"></div>
+
+<!-- LOCK -->
+<div id="lock">
+  <div class="lock-t" id="lock-t">00:00</div>
+  <div class="lock-d" id="lock-d">—</div>
+  <div class="lock-hint">Click anywhere to unlock</div>
+  <button class="lock-btn" onclick="hideLock()">Unlock →</button>
+</div>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="login-bg-text">BINOD</div>
+  <div class="login-time" id="l-clk">00:00</div>
+  <div class="login-date" id="l-dt">—</div>
+  <div class="login-card">
+    <div class="avatar-wrap">
+      <div class="avatar-ring"></div>
+      <div class="avatar-ring-inner"></div>
+      <div class="avatar-img">
+        <img src="image.png" alt="Binod" onerror="this.parentElement.innerHTML='👨‍💻'"/>
+      </div>
+    </div>
+    <div class="login-name">Binod Budha</div>
+    <div class="login-status"><span class="status-dot"></span>ONLINE · OPEN TO WORK</div>
+    <div class="login-input-wrap">
+      <input class="login-input" type="password" id="pwd" placeholder="Enter password…" onkeydown="if(event.key==='Enter')doLogin()"/>
+      <button class="login-eye" id="eyebtn" onclick="toggleEye()"><i class="ri-eye-off-line"></i></button>
+    </div>
+    <div class="login-error" id="lerr"></div>
+    <button class="login-btn" onclick="doLogin()">UNLOCK →</button>
+    <div class="login-hint">hint: <span style="color:var(--accent)">binod</span></div>
+  </div>
+</div>
+
+<!-- DESKTOP -->
+<div id="desktop">
+  <div class="wsplash">
+    <div class="ws-title">Welcome.</div>
+    <div class="ws-sub">BinodOS 3.0 · Initializing</div>
+    <div class="ws-bar"><div class="ws-fill"></div></div>
+  </div>
+
+  <!-- DESKTOP ICONS -->
+  <div id="desktop-icons">
+    <div class="dsk-icon" ondblclick="openWin('home')" onclick="selIcon(this)"><div class="dsk-ico">🏠</div><div class="dsk-lbl">Home</div></div>
+    <div class="dsk-icon" ondblclick="openWin('about')" onclick="selIcon(this)"><div class="dsk-ico">🧠</div><div class="dsk-lbl">About Me</div></div>
+    <div class="dsk-icon" ondblclick="openWin('skills')" onclick="selIcon(this)"><div class="dsk-ico">⚡</div><div class="dsk-lbl">Skills</div></div>
+    <div class="dsk-icon" ondblclick="openWin('projects')" onclick="selIcon(this)"><div class="dsk-ico">🚀</div><div class="dsk-lbl">Projects</div></div>
+    <div class="dsk-icon" ondblclick="openWin('certs')" onclick="selIcon(this)"><div class="dsk-ico">🏆</div><div class="dsk-lbl">Certificates</div></div>
+    <div class="dsk-icon" ondblclick="openWin('connect')" onclick="selIcon(this)"><div class="dsk-ico">📡</div><div class="dsk-lbl">Connect</div></div>
+    <div class="dsk-icon" ondblclick="openWin('terminal')" onclick="selIcon(this)"><div class="dsk-ico">⌨️</div><div class="dsk-lbl">Terminal</div></div>
+    <div class="dsk-icon" ondblclick="openWin('pomodoro')" onclick="selIcon(this)"><div class="dsk-ico">🍅</div><div class="dsk-lbl">Pomodoro</div></div>
+    <div class="dsk-icon" ondblclick="openWin('settings')" onclick="selIcon(this)" style="grid-column:3;"><div class="dsk-ico">⚙️</div><div class="dsk-lbl">Settings</div></div>
+    <div class="dsk-icon" ondblclick="openWin('calc')" onclick="selIcon(this)"><div class="dsk-ico">🧮</div><div class="dsk-lbl">Calculator</div></div>
+    <div class="dsk-icon" ondblclick="showResDialog()" onclick="selIcon(this)"><div class="dsk-ico">📄</div><div class="dsk-lbl">Resume</div></div>
+  </div>
+
+  <!-- CLOCK WIDGET only -->
+  <div class="wzone" id="wzone">
+    <div class="widget" id="w-clk">
+      <div class="wt">System Time</div>
+      <div class="clk-time"><span id="wh">00</span>:<span id="wm">00</span><span class="clk-ampm" id="wap">AM</span></div>
+      <div class="clk-date" id="wdt">—</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- TASKBAR -->
+<div id="taskbar" style="display:none;">
+  <div class="tb-left">
+    <button class="tb-brand" onclick="openSpotlight()">⌘ BinodOS 3</button>
+    <div class="tb-div"></div>
+    <div class="tb-tabs" id="tbtabs"></div>
+  </div>
+  <div class="tb-right">
+    <div class="tray">
+      <div class="tray-i gn" id="tr-wifi" onclick="showToast('📶 WiFi Connected')"><i class="ri-wifi-fill"></i></div>
+      <div class="tray-i" id="tr-bat"><i class="ri-battery-fill"></i><span id="batval">—</span></div>
+      <div class="tray-i" onclick="showLock()" title="Lock Screen"><i class="ri-lock-line"></i></div>
+    </div>
+    <div id="tray-clk" onclick="toggleCalendar()">00:00</div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- CALENDAR POPUP -->
+<div id="cal-popup">
+  <div class="cal-header">
+    <button class="cal-nav" onclick="calNav(-1)"><i class="ri-arrow-left-s-line"></i></button>
+    <div class="cal-month-lbl" id="cal-lbl">—</div>
+    <button class="cal-nav" onclick="calNav(1)"><i class="ri-arrow-right-s-line"></i></button>
+  </div>
+  <div class="cal-grid" id="cal-grid"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// BG CANVAS
+// ═══════════════════════════════════════
+(function(){
+  const c=document.getElementById('bg-canvas');const ctx=c.getContext('2d');
+  let W,H,nodes=[];
+  function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  for(let i=0;i<55;i++)nodes.push({x:Math.random()*2000,y:Math.random()*2000,vx:(Math.random()-.5)*.18,vy:(Math.random()-.5)*.18,r:Math.random()*1.4+.3});
+  let paused=false;window._bgPause=v=>paused=v;
+  function draw(){
+    if(!paused){
+      ctx.clearRect(0,0,W,H);
+      nodes.forEach(n=>{n.x=(n.x+n.vx+W)%W;n.y=(n.y+n.vy+H)%H;});
+      ctx.strokeStyle='rgba(0,212,255,.038)';ctx.lineWidth=.5;
+      for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){
+        const dx=nodes[i].x-nodes[j].x,dy=nodes[i].y-nodes[j].y,d=Math.sqrt(dx*dx+dy*dy);
+        if(d<135){ctx.globalAlpha=(135-d)/135*.28;ctx.beginPath();ctx.moveTo(nodes[i].x,nodes[i].y);ctx.lineTo(nodes[j].x,nodes[j].y);ctx.stroke();}
+      }
+      ctx.globalAlpha=1;
+      nodes.forEach(n=>{ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,Math.PI*2);ctx.fillStyle='rgba(0,255,136,.28)';ctx.fill();});
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ═══════════════════════════════════════
+// WALLPAPER
+// ═══════════════════════════════════════
+const WPS=[
+  {id:'none',label:'Default',type:'css',preview:''},
+  {id:'aurora',label:'Aurora',value:'linear-gradient(135deg,#06081a 0%,#0a1f3a 25%,#051828 50%,#081a0c 75%,#06081a 100%)',preview:'linear-gradient(135deg,#06081a,#0a1f3a,#081a0c)'},
+  {id:'sunset',label:'Sunset',value:'linear-gradient(135deg,#0a0118 0%,#180530 30%,#280820 60%,#381515 100%)',preview:'linear-gradient(135deg,#0a0118,#280820,#381515)'},
+  {id:'ocean',label:'Ocean',value:'linear-gradient(180deg,#020b18 0%,#03122a 40%,#041d3c 70%,#021830 100%)',preview:'linear-gradient(180deg,#020b18,#03122a,#021830)'},
+  {id:'forest',label:'Forest',value:'linear-gradient(135deg,#020c06 0%,#05180c 30%,#082414 60%,#021008 100%)',preview:'linear-gradient(135deg,#020c06,#082414,#021008)'},
+  {id:'nebula',label:'Nebula',value:'radial-gradient(ellipse at 20% 50%,#180530 0%,#060812 50%)',preview:'radial-gradient(ellipse at 20% 50%,#180530,#060812)'},
+  {id:'cyber',label:'Cyber',value:'linear-gradient(135deg,#000408 0%,#000e1c 40%,#000a15 100%)',preview:'linear-gradient(135deg,#000408,#000e1c,#000a15)'},
+  {id:'crimson',label:'Crimson',value:'linear-gradient(135deg,#0a0205 0%,#1a0208 30%,#1a0505 60%,#0a0202 100%)',preview:'linear-gradient(135deg,#0a0205,#1a0208,#0a0202)'},
+];
+let curWP='none',customWP='',wpBlur=0,wpBright=1,wpOpacity=1;
+function applyWP(id,url){
+  curWP=id;const el=document.getElementById('wp-img');
+  const wp=WPS.find(w=>w.id===id);
+  if(id==='custom'&&url){el.style.backgroundImage=`url(${url})`;}
+  else if(wp&&wp.value){el.style.backgroundImage=wp.value;}
+  else{el.style.backgroundImage='none';el.style.background='var(--bg)';}
+  applyWPFX();
+}
+function applyWPFX(){
+  const el=document.getElementById('wp-img');
+  const f=[];if(wpBlur>0)f.push(`blur(${wpBlur}px)`);if(wpBright!==1)f.push(`brightness(${wpBright})`);
+  el.style.filter=f.join(' ');el.style.opacity=wpOpacity;
+}
+
+// ═══════════════════════════════════════
+// LOGIN
+// ═══════════════════════════════════════
+function updLoginClk(){
+  const n=new Date();
+  document.getElementById('l-clk').textContent=n.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:false});
+  document.getElementById('l-dt').textContent=n.toLocaleDateString('en-IN',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+}
+setInterval(updLoginClk,1000);updLoginClk();
+function toggleEye(){const i=document.getElementById('pwd'),b=document.getElementById('eyebtn').querySelector('i');i.type=i.type==='password'?'text':'password';b.className=i.type==='password'?'ri-eye-off-line':'ri-eye-line';}
+function doLogin(){
+  const v=document.getElementById('pwd').value.trim().toLowerCase();
+  const e=document.getElementById('lerr');
+  if(v==='binod'){
+    e.textContent='';
+    document.getElementById('login').classList.add('hide');
+    setTimeout(()=>{
+      document.getElementById('login').style.display='none';
+      document.getElementById('desktop').style.display='block';
+      document.getElementById('taskbar').style.display='flex';
+      spawnParticles();updTray();startStats();startWClk();
+      const sw=sessionStorage.getItem('bos-wp');if(sw){const d=JSON.parse(sw);applyWP(d.id,d.url);customWP=d.url||'';}
+      const sa=sessionStorage.getItem('bos-accent');if(sa)setAccentDirect(sa);
+      // restore font settings
+      const sf=sessionStorage.getItem('bos-font');if(sf){const fd=JSON.parse(sf);applyFontSettings(fd.family,fd.weight,fd.color);}
+      setTimeout(()=>showToast('🚀 Welcome back, Binod!'),700);
+    },650);
+  } else {
+    e.textContent='✗ Incorrect. Hint: "binod"';
+    document.getElementById('pwd').value='';
+    document.getElementById('pwd').style.borderColor='var(--red)';
+    setTimeout(()=>document.getElementById('pwd').style.borderColor='',1200);
+  }
+}
+
+// ═══════════════════════════════════════
+// DESKTOP ICON SELECTION
+// ═══════════════════════════════════════
+function selIcon(el){
+  document.querySelectorAll('.dsk-icon').forEach(i=>i.classList.remove('selected'));
+  el.classList.add('selected');
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.dsk-icon'))document.querySelectorAll('.dsk-icon').forEach(i=>i.classList.remove('selected'));
+});
+
+// ═══════════════════════════════════════
+// LOCK
+// ═══════════════════════════════════════
+function showLock(){const l=document.getElementById('lock');l.classList.add('show');updLockClk();}
+function hideLock(){document.getElementById('lock').classList.remove('show');}
+function updLockClk(){
+  const n=new Date();
+  document.getElementById('lock-t').textContent=n.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:false});
+  document.getElementById('lock-d').textContent=n.toLocaleDateString('en-IN',{weekday:'long',month:'long',day:'numeric'});
+}
+setInterval(updLockClk,1000);
+document.getElementById('lock').addEventListener('click',function(e){if(e.target===this||e.target.className==='lock-hint'||e.target.className==='lock-t'||e.target.className==='lock-d')hideLock();});
+
+// ═══════════════════════════════════════
+// CALENDAR
+// ═══════════════════════════════════════
+let calDate=new Date();
+function toggleCalendar(){
+  const p=document.getElementById('cal-popup');
+  if(p.classList.contains('open')){p.classList.remove('open');return;}
+  calDate=new Date();
+  renderCal();
+  // position above tray clock
+  const clk=document.getElementById('tray-clk');
+  const rect=clk.getBoundingClientRect();
+  p.style.right=(window.innerWidth-rect.right)+'px';
+  p.style.bottom=(window.innerHeight-rect.top+8)+'px';
+  p.classList.add('open');
+}
+function calNav(dir){calDate.setMonth(calDate.getMonth()+dir);renderCal();}
+function renderCal(){
+  const today=new Date();
+  const yr=calDate.getFullYear(),mo=calDate.getMonth();
+  document.getElementById('cal-lbl').textContent=calDate.toLocaleDateString('en-IN',{month:'long',year:'numeric'});
+  const grid=document.getElementById('cal-grid');
+  const days=['Su','Mo','Tu','We','Th','Fr','Sa'];
+  let html=days.map(d=>`<div class="cal-day-name">${d}</div>`).join('');
+  const first=new Date(yr,mo,1).getDay();
+  const last=new Date(yr,mo+1,0).getDate();
+  const prevLast=new Date(yr,mo,0).getDate();
+  // prev month
+  for(let i=first-1;i>=0;i--)html+=`<div class="cal-day other-month">${prevLast-i}</div>`;
+  // current month
+  for(let d=1;d<=last;d++){
+    const isToday=d===today.getDate()&&mo===today.getMonth()&&yr===today.getFullYear();
+    html+=`<div class="cal-day${isToday?' today':''}">${d}</div>`;
+  }
+  // next month fill
+  const total=first+last;const rem=total%7?7-(total%7):0;
+  for(let d=1;d<=rem;d++)html+=`<div class="cal-day other-month">${d}</div>`;
+  grid.innerHTML=html;
+}
+document.addEventListener('click',e=>{
+  const p=document.getElementById('cal-popup');
+  if(!e.target.closest('#cal-popup')&&!e.target.closest('#tray-clk'))p.classList.remove('open');
+});
+
+// ═══════════════════════════════════════
+// FONT SETTINGS
+// ═══════════════════════════════════════
+let pendingFont={family:"'JetBrains Mono',monospace",weight:'400',color:'#ddeeff'};
+
+function applyFontSettings(family,weight,color){
+  document.documentElement.style.setProperty('--ui-font',family);
+  document.documentElement.style.setProperty('--ui-font-weight',weight);
+  document.documentElement.style.setProperty('--ui-font-color',color);
+  document.documentElement.style.setProperty('--text',color);
+  pendingFont={family,weight,color};
+  sessionStorage.setItem('bos-font',JSON.stringify(pendingFont));
+}
+
+// ═══════════════════════════════════════
+// SYSTEM
+// ═══════════════════════════════════════
+function startStats(){
+  function upd(){
+    if(navigator.getBattery)navigator.getBattery().then(b=>{
+      const p=Math.round(b.level*100);
+      document.getElementById('batval').textContent=p+'%'+(b.charging?' ⚡':'');
+      document.getElementById('tr-bat').className='tray-i '+(b.charging||p>50?'gn':p>20?'yw':'rd');
+    });
+  }
+  upd();setInterval(upd,5000);
+}
+function updTray(){
+  document.getElementById('tr-wifi').className='tray-i '+(navigator.onLine?'gn':'rd');
+  if(navigator.getBattery)navigator.getBattery().then(b=>{document.getElementById('batval').textContent=Math.round(b.level*100)+'%'+(b.charging?' ⚡':'');});
+}
+setInterval(()=>{
+  const n=new Date();
+  document.getElementById('tray-clk').textContent=n.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true})+' · '+n.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+},1000);
+function startWClk(){
+  function tick(){
+    const n=new Date();let h=n.getHours(),m=n.getMinutes(),ap=h>=12?'PM':'AM';
+    h=h%12||12;
+    document.getElementById('wh').textContent=String(h).padStart(2,'0');
+    document.getElementById('wm').textContent=String(m).padStart(2,'0');
+    document.getElementById('wap').textContent=ap;
+    document.getElementById('wdt').textContent=n.toLocaleDateString('en-IN',{weekday:'long',month:'long',day:'numeric'});
+  }
+  tick();setInterval(tick,1000);
+}
+function spawnParticles(){
+  for(let i=0;i<18;i++){const p=document.createElement('div');p.className='particle';
+    const s=Math.random()*2.5+.4;
+    p.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;background:${Math.random()>.5?'#00ff88':'#00d4ff'};animation-duration:${11+Math.random()*14}s;animation-delay:${Math.random()*10}s;opacity:.18;`;
+    document.getElementById('desktop').appendChild(p);
+  }
+}
+
+// ═══════════════════════════════════════
+// LOGOUT
+// ═══════════════════════════════════════
+function showLogout(){
+  closeCtx();
+  const ov=document.createElement('div');ov.className='logout-ov';ov.id='lgt-ov';
+  ov.innerHTML=`<div class="logout-modal"><h3>👋 Sign Out?</h3><p>You'll be returned to the login screen.</p><div class="logout-btns"><button class="btn-cancel" onclick="document.getElementById('lgt-ov').remove()">Cancel</button><button class="btn-logout" onclick="doLogout()">Sign Out →</button></div></div>`;
+  document.body.appendChild(ov);
+}
+function doLogout(){
+  Object.keys(wins).forEach(id=>{wins[id].el.remove();});wins={};
+  document.getElementById('lgt-ov')?.remove();
+  document.getElementById('desktop').style.display='none';
+  document.getElementById('taskbar').style.display='none';
+  document.querySelectorAll('.particle').forEach(p=>p.remove());
+  document.getElementById('tbtabs').innerHTML='';
+  document.getElementById('pwd').value='';
+  document.getElementById('lerr').textContent='';
+  const ls=document.getElementById('login');ls.style.display='flex';ls.classList.remove('hide');
+}
+
+// ═══════════════════════════════════════
+// SPOTLIGHT
+// ═══════════════════════════════════════
+const SITEMS=[
+  {ico:'🏠',lbl:'Home',sub:'Main introduction',fn:()=>openWin('home')},
+  {ico:'🧠',lbl:'About Me',sub:'Education, experience & achievements',fn:()=>openWin('about')},
+  {ico:'⚡',lbl:'Skills',sub:'Technologies & tools',fn:()=>openWin('skills')},
+  {ico:'🚀',lbl:'Projects',sub:'Scam AI, Resume Builder & more',fn:()=>openWin('projects')},
+  {ico:'🏆',lbl:'Certificates',sub:'Kaggle, Google & more',fn:()=>openWin('certs')},
+  {ico:'📡',lbl:'Connect',sub:'Get in touch',fn:()=>openWin('connect')},
+  {ico:'📄',lbl:'Resume',sub:'View or download',fn:()=>showResDialog()},
+  {ico:'⌨️',lbl:'Terminal',sub:'Interactive command line',fn:()=>openWin('terminal')},
+  {ico:'🌤️',lbl:'Weather',sub:'Gandhinagar forecast',fn:()=>openWin('weather')},
+  {ico:'🍅',lbl:'Pomodoro Timer',sub:'Focus & productivity',fn:()=>openWin('pomodoro')},
+  {ico:'🧮',lbl:'Calculator',sub:'Built-in calculator',fn:()=>openWin('calc')},
+  {ico:'⚙️',lbl:'Settings',sub:'Appearance, wallpaper & more',fn:()=>openWin('settings')},
+  {ico:'🔒',lbl:'Lock Screen',sub:'Lock BinodOS',fn:()=>showLock()},
+  {ico:'🚪',lbl:'Sign Out',sub:'Return to login',fn:()=>showLogout()},
+];
+function openSpotlight(){
+  const ex=document.getElementById('spotlight');if(ex){ex.remove();return;}
+  const el=document.createElement('div');el.id='spotlight';
+  el.style.cssText='position:fixed;inset:0;z-index:15000;display:flex;align-items:flex-start;justify-content:center;padding-top:90px;background:rgba(0,0,0,.65);backdrop-filter:blur(14px);animation:fadeIn .14s ease;';
+  el.innerHTML=`<div class="sp-box"><div class="sp-row"><i class="ri-search-line"></i><input class="sp-inp" id="sp-inp" placeholder="Search apps & commands…" autocomplete="off"/><span style="font-size:9px;color:var(--muted2)">ESC</span></div><div class="sp-results" id="sp-res"></div></div>`;
+  document.body.appendChild(el);
+  el.addEventListener('click',e=>{if(e.target===el)el.remove();});
+  const inp=document.getElementById('sp-inp');inp.focus();
+  window._spFn=i=>{SITEMS[i].fn();document.getElementById('spotlight')?.remove();};
+  function render(q){
+    const res=document.getElementById('sp-res');
+    const filtered=q?SITEMS.map((item,i)=>({item,i})).filter(({item})=>item.lbl.toLowerCase().includes(q)||item.sub.toLowerCase().includes(q)):SITEMS.map((item,i)=>({item,i}));
+    if(!filtered.length){res.innerHTML='<div style="padding:18px;text-align:center;font-size:10px;color:var(--muted)">No results</div>';return;}
+    res.innerHTML=`<div class="sp-grp"><div class="sp-grp-l">Applications & Commands</div>${filtered.map(({item,i})=>`<div class="sp-result" onclick="_spFn(${i})"><div class="sr-ico">${item.ico}</div><div><div class="sr-lbl">${item.lbl}</div><div class="sr-sub">${item.sub}</div></div><div class="sr-kbd">↵</div></div>`).join('')}</div>`;
+  }
+  render('');
+  inp.addEventListener('input',e=>render(e.target.value.toLowerCase()));
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='Escape')el.remove();
+    if(e.key==='Enter'){const f=document.querySelector('.sp-result');if(f)f.click();}
+  });
+}
+document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();openSpotlight();}});
+
+// ═══════════════════════════════════════
+// WINDOW SYSTEM
+// ═══════════════════════════════════════
+let wins={},zTop=200;
+const WDEFS={
+  home:     {title:'🏠 Home',       w:590,h:510,x:85,y:28},
+  about:    {title:'🧠 About Me',   w:780,h:550,x:95,y:18},
+  skills:   {title:'⚡ Skills',     w:700,h:510,x:105,y:22},
+  projects: {title:'🚀 Projects',   w:740,h:530,x:115,y:18},
+  certs:    {title:'🏆 Certificates',w:640,h:470,x:125,y:28},
+  connect:  {title:'📡 Connect',    w:520,h:470,x:145,y:45},
+  terminal: {title:'>_ Terminal',   w:660,h:450,x:135,y:38},
+  weather:  {title:'🌤️ Weather',   w:440,h:520,x:560,y:28},
+  pomodoro: {title:'🍅 Pomodoro',   w:370,h:470,x:575,y:38},
+  calc:     {title:'🧮 Calculator', w:310,h:470,x:630,y:38},
+  settings: {title:'⚙️ Settings',  w:680,h:510,x:125,y:38},
+  resume:   {title:'📄 Resume',     w:700,h:570,x:95,y:18},
+};
+
+function openWin(id){
+  if(wins[id]){bringFront(id);unmin(id);return;}
+  const def=WDEFS[id];const el=document.createElement('div');el.className='win';el.id='w-'+id;
+  el.style.cssText=`left:${def.x}px;top:${def.y}px;width:${def.w}px;height:${def.h}px;`;
+  let inner='';
+  if(id==='terminal')inner=buildTermHTML(id);
+  else if(id==='weather')inner=buildWeatherHTML();
+  else if(id==='pomodoro')inner=buildPomoHTML();
+  else if(id==='calc')inner=buildCalcHTML();
+  else if(id==='settings')inner=buildSettingsHTML();
+  else if(id==='resume')inner=buildResumeHTML();
+  else inner=`<div class="wbody"><div class="wscroll">${buildContent(id)}</div></div>`;
+  el.innerHTML=`
+    <div class="wbar" onmousedown="startDrag(event,'${id}')">
+      <div class="wdots">
+        <button class="wd wd-close" onclick="closeWin('${id}')"><span class="sym">✕</span></button>
+        <button class="wd wd-min" onclick="minWin('${id}')"><span class="sym">−</span></button>
+        <button class="wd wd-max" onclick="maxWin('${id}')"><span class="sym">+</span></button>
+      </div>
+      <div class="wtitle">${def.title}</div>
+    </div>
+    ${inner}
+    <div class="rhandle rse" onmousedown="startResize(event,'${id}','se')"></div>
+    <div class="rhandle re" onmousedown="startResize(event,'${id}','e')"></div>
+    <div class="rhandle rs" onmousedown="startResize(event,'${id}','s')"></div>`;
+  el.addEventListener('mousedown',()=>bringFront(id));
+  document.getElementById('desktop').appendChild(el);
+  wins[id]={el,min:false,max:false,_prev:null};
+  bringFront(id);addPill(id,def.title);
+  setTimeout(()=>{
+    if(id==='terminal')termInit(id);
+    if(id==='calc')calcInit();
+    if(id==='settings')initSettings();
+    if(id==='resume')initResume();
+    if(id==='pomodoro')pomodoroInit();
+    updDockBadges();
+  },55);
+}
+
+function buildContent(id){
+  if(id==='home')return buildHome();
+  if(id==='about')return buildAbout();
+  if(id==='skills')return buildSkills();
+  if(id==='projects')return buildProjects();
+  if(id==='certs')return buildCerts();
+  if(id==='connect')return buildConnect();
+  return '<div style="padding:18px;color:var(--muted)">Loading…</div>';
+}
+
+// ── HOME ──
+function buildHome(){return `
+  <div class="home-hero">
+    <div class="home-av"><img src="image.png" alt="Binod" onerror="this.parentElement.innerHTML='<div style=width:100%;height:100%;background:linear-gradient(135deg,var(--surface2),var(--surface3));display:flex;align-items:center;justify-content:center;font-size:42px>👨‍💻</div>'"/></div>
+    <div>
+      <div class="home-name">Hello<span style="color:var(--red)">!</span><br/>I'm <span class="ac">BINOD BUDHA</span></div>
+      <div class="home-role">MERN Stack Developer · CS Undergraduate</div>
+      <div class="home-meta">
+        <div class="home-meta-i"><i class="ri-map-pin-2-fill"></i>Gandhinagar, Gujarat, India</div>
+        <div class="home-meta-i"><i class="ri-graduation-cap-fill"></i>PDEU · GPA 9.17/10 · CSE 2027</div>
+        <div class="home-meta-i"><i class="ri-checkbox-circle-fill" style="color:var(--accent)"></i><span style="color:var(--accent)">Open to internships & full-time roles</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="home-quote">"Learning is better when we feel it."</div>
+  <div class="home-btns">
+    <button class="btn-p" onclick="openWin('projects')">View Projects →</button>
+    <button class="btn-s" onclick="openWin('connect')">📡 Get In Touch</button>
+    <button class="btn-s" onclick="openWin('skills')">⚡ Skills</button>
+    <button class="btn-s" onclick="openWin('terminal')">⌨️ Terminal</button>
+  </div>
+  <div class="home-stats">
+    <div class="hs"><div class="hs-v">9.17</div><div class="hs-l">GPA / 10</div></div>
+    <div class="hs"><div class="hs-v" style="color:var(--blue)">4+</div><div class="hs-l">Projects</div></div>
+    <div class="hs"><div class="hs-v" style="color:var(--purple)">2+</div><div class="hs-l">Certs</div></div>
+  </div>
+  <div style="margin-top:14px;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:11px;">
+    <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Tech Stack</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;">
+      ${['React.js','Node.js','Express.js','MongoDB','Python','Tailwind','AWS','Groq API','NLP','n8n'].map(t=>`<span class="tag">${t}</span>`).join('')}
+    </div>
+  </div>`;}
+
+// ── ABOUT ──
+function buildAbout(){return `
+  <div class="sh">About <span style="color:var(--accent)">Me</span></div>
+  <div class="ss">Full profile — education, experience & achievements</div>
+  <div style="margin-bottom:14px;">
+    <div class="ab-card"><div class="ab-head"><i class="ri-user-3-line"></i>Summary</div>
+      <div class="ab-ln">MERN Stack Developer & CS undergraduate specializing in scalable full-stack apps. Experienced integrating AI/ML models and LLM APIs — including an <strong>AI-powered scam detection platform</strong> and <strong>NLP-based review routing system</strong>. Proficient in RESTful APIs, AWS deployments, and responsive UIs. Consistently top-ranked at PDEU with GPA 9.17/10.</div>
+    </div>
+  </div>
+  <div class="ab-lay">
+    <div>
+      <div class="ab-card" style="margin-bottom:10px"><div class="ab-head"><i class="ri-graduation-cap-line"></i>Education</div>
+        <div class="tl">
+          <div class="tl-i"><div class="tl-dot"></div><div class="tl-c"><div class="tl-yr">2023 – 2027</div><div class="tl-ttl">B.Tech CSE · PDEU</div><div class="tl-sub" style="color:var(--yellow)">GPA: 9.17 / 10.0 · Gandhinagar, India</div></div></div>
+          <div class="tl-i"><div class="tl-dot"></div><div class="tl-c"><div class="tl-yr">2021 – 2023</div><div class="tl-ttl">Higher Secondary · Padmodaya School</div><div class="tl-sub" style="color:var(--yellow)">GPA: 3.63 / 4.00 · Nepal</div></div></div>
+        </div>
+      </div>
+      <div class="ab-card"><div class="ab-head"><i class="ri-trophy-line"></i>Achievements</div>
+        <div class="ach-i"><span class="ach-ico">🏅</span><div class="ach-txt"><strong>COMPEX Scholarship</strong> — Merit-based award by Govt. of India for high-achieving Nepali students, 2023.</div></div>
+        <div class="ach-i"><span class="ach-ico">⭐</span><div class="ach-txt"><strong>GPA 9.17/10</strong> at PDEU — consistently top-ranked in CSE program.</div></div>
+        <div class="ach-i"><span class="ach-ico">🤖</span><div class="ach-txt"><strong>Google × Kaggle</strong> 5-Day Generative AI Intensive, 2025.</div></div>
+      </div>
+    </div>
+    <div>
+      <div style="margin-bottom:8px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);font-weight:700;">Experience</div>
+      <div class="exp-c">
+        <div class="exp-role">Frontend Developer</div>
+        <div class="exp-place">Self-Initiated · Personal Portfolio Website</div>
+        <div class="exp-date">Jan 2024 – Present · React.js, Express.js, Tailwind</div>
+        <div class="exp-desc">• Architected & launched portfolio on a custom domain, receiving traffic from multiple countries.<br/>• Engineered fully responsive frontend with 100% cross-device compatibility.<br/>• Improved page load performance by 40%.</div>
+      </div>
+      <div class="ab-card" style="margin-top:6px"><div class="ab-head"><i class="ri-mail-line"></i>Contact</div>
+        <div class="ab-ln">📧 <span style="color:var(--blue)">bcb4314@gmail.com</span></div>
+        <div class="ab-ln">📞 +91-6393490697</div>
+        <div class="ab-ln">🌐 <a href="https://budhabinod.com.np" target="_blank" style="color:var(--accent);text-decoration:none;">budhabinod.com.np</a></div>
+        <div class="ab-ln" style="color:var(--accent);margin-top:5px">✅ Open to internships & full-time roles</div>
+      </div>
+      <div class="ab-card" style="margin-top:8px"><div class="ab-head"><i class="ri-flag-line"></i>Languages</div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;"><span class="tag gn">🇳🇵 Nepali</span><span class="tag bl">🇮🇳 Hindi</span><span class="tag">🇬🇧 English</span></div>
+      </div>
+    </div>
+  </div>`;}
+
+// ── SKILLS ──
+function buildSkills(){
+  const cats=[
+    {label:'Languages',skills:[{n:'Java',ico:'☕',pct:80},{n:'Python',ico:'🐍',pct:78},{n:'JavaScript ES6+',ico:'💛',pct:90}]},
+    {label:'Frontend',skills:[{n:'React.js',ico:'⚛️',pct:88},{n:'HTML5 / CSS3',ico:'🌐',pct:92},{n:'Tailwind CSS',ico:'🎨',pct:85}]},
+    {label:'Backend',skills:[{n:'Node.js',ico:'🟢',pct:80},{n:'Express.js',ico:'🛤️',pct:82},{n:'REST API Design',ico:'🔗',pct:85}]},
+    {label:'Database',skills:[{n:'MongoDB',ico:'🍃',pct:80},{n:'MySQL',ico:'🐬',pct:70}]},
+    {label:'AI & ML',skills:[{n:'NLP',ico:'🧠',pct:72},{n:'Groq API',ico:'⚡',pct:78},{n:'n8n Automation',ico:'🔄',pct:70},{n:'Prompt Engineering',ico:'💬',pct:80}]},
+    {label:'Cloud & Tools',skills:[{n:'AWS',ico:'☁️',pct:65},{n:'Git / GitHub',ico:'🐙',pct:88},{n:'Postman',ico:'📮',pct:80},{n:'VS Code',ico:'💻',pct:95}]},
+  ];
+  return `<div class="sh">Skills <span style="color:var(--accent)">I</span> Have</div>
+  <div class="ss">Technologies, tools & frameworks with proficiency levels</div>
+  ${cats.map(c=>`<div class="sk-cat"><div class="sk-cat-t">${c.label}</div>
+    <div class="sk-pills">${c.skills.map(s=>`
+      <div class="sk-pill" style="flex-direction:column;align-items:flex-start;min-width:130px;">
+        <div style="display:flex;align-items:center;gap:5px;"><span class="sk-ico">${s.ico}</span><span class="sk-name">${s.n}</span></div>
+        <div class="sk-bar-w"><div class="sk-bar" style="width:${s.pct}%;background:linear-gradient(90deg,var(--accent),var(--blue));"></div></div>
+      </div>`).join('')}</div></div>`).join('')}`;}
+
+// ── PROJECTS ──
+function buildProjects(){return `
+  <div class="sh">Projects <span style="color:var(--accent)">I</span> Built</div>
+  <div class="ss">Real-world applications with modern tech stacks</div>
+  <div class="pj-list">${[
+    {title:'Scam Detection AI Platform',badge:'b-ai',bl:'AI · SECURITY',tech:['React.js','Python','Groq API','REST API'],desc:'AI-powered platform analyzing messages, emails, screenshots & PDFs via Groq API — generating risk scores 0–100 and identifying phishing patterns in real time.',gh:'https://github.com/binod01nep'},
+    {title:'Smart Review & Routing System',badge:'b-full',bl:'NLP · AUTOMATION',tech:['Python','Node.js','Express.js','NLP'],desc:'NLP-based customer feedback classifier routing issues to internal teams — reducing manual effort by 60%+.',gh:'https://github.com/binod01nep'},
+    {title:'Smart Resume Builder',badge:'b-web',bl:'FULL STACK',tech:['MongoDB','Express.js','React.js','Node.js','Tailwind'],desc:'Full-stack resume builder with MongoDB CRUD, real-time live preview, automated PDF export, and 10+ resume templates.',gh:'https://github.com/binod01nep'},
+    {title:'Banking Ledger System',badge:'b-web',bl:'BACKEND',tech:['Express.js','MongoDB','REST API','JWT'],desc:'Secure backend system to manage customer transactions, balances, and account history with REST APIs and JWT auth.',gh:'https://github.com/binod01nep'},
+  ].map(p=>`<div class="pj-card">
+    <div class="pj-hd"><div class="pj-ttl">${p.title}</div><div class="pj-badge ${p.badge}">${p.bl}</div></div>
+    <div class="pj-techs">${p.tech.map(t=>`<span class="pj-tech">${t}</span>`).join('')}</div>
+    <div class="pj-desc">${p.desc}</div>
+    <div class="pj-links">
+      <a href="${p.gh}" target="_blank" class="pj-link"><i class="ri-github-fill"></i> GitHub</a>
+      <button class="pj-link" onclick="showToast('🚀 Live demo coming soon!')"><i class="ri-external-link-line"></i> Live Demo</button>
+    </div>
+  </div>`).join('')}</div>`;}
+
+// ── CERTS ──
+function buildCerts(){return `
+  <div class="sh">Certificates</div>
+  <div class="ss">Verified credentials & completed courses</div>
+  <div class="cert-grid">${[
+    {name:'Kaggle Machine Learning Certificate',org:'Kaggle · Google',img:'Kaggle_certificate.png',badge:'Verified'},
+    {name:'Kaggle Python Certificate',org:'Kaggle · Google',img:'python.png',badge:'Verified'},
+    {name:'5-Day GenAI Intensive Agent Program',org:'Google DeepMind · Kaggle',img:'',badge:'2025'},
+  ].map(c=>`<div class="cert-c">
+    <div class="cert-img">
+      ${c.img?`<img src="${c.img}" alt="${c.name}" onerror="this.style.display='none'">`:''}
+      <div class="cert-fb">🏆</div>
+      <div class="cert-badge">${c.badge}</div>
+    </div>
+    <div class="cert-b"><div class="cert-n">${c.name}</div><div class="cert-o">${c.org}</div></div>
+  </div>`).join('')}</div>`;}
+
+// ── CONNECT ──
+function buildConnect(){return `
+  <div class="sh">Get In <span style="color:var(--accent)">Touch</span></div>
+  <div class="ss">Open to internships, collaborations & full-time roles</div>
+  <div class="conn-grid">
+    <a href="https://github.com/binod01nep" target="_blank" class="conn-c"><i class="ri-github-fill" style="color:#f0f6fc"></i><div><div class="conn-ttl">GitHub</div><div class="conn-sub">@binod01nep</div></div></a>
+    <a href="mailto:bcb4314@gmail.com" class="conn-c"><i class="ri-mail-fill" style="color:var(--red)"></i><div><div class="conn-ttl">Email</div><div class="conn-sub">bcb4314@gmail.com</div></div></a>
+    <a href="https://www.linkedin.com/in/binod-budha-7691773a1/" target="_blank" class="conn-c"><i class="ri-linkedin-box-fill" style="color:#0a66c2"></i><div><div class="conn-ttl">LinkedIn</div><div class="conn-sub">binod-budha</div></div></a>
+    <a href="https://leetcode.com/u/AmBiLax/" target="_blank" class="conn-c"><i class="ri-code-s-slash-line" style="color:var(--orange)"></i><div><div class="conn-ttl">LeetCode</div><div class="conn-sub">@AmBiLax</div></div></a>
+    <a href="https://budhabinod.com.np" target="_blank" class="conn-c"><i class="ri-global-line" style="color:var(--accent)"></i><div><div class="conn-ttl">Website</div><div class="conn-sub">budhabinod.com.np</div></div></a>
+    <div class="conn-c" style="cursor:pointer" onclick="showResDialog()"><i class="ri-file-pdf-line" style="color:var(--red)"></i><div><div class="conn-ttl">Resume</div><div class="conn-sub">View or Download</div></div></div>
+  </div>
+  <div class="ci-box">
+    <div class="ci-row"><i class="ri-mail-fill" style="color:var(--red)"></i><span class="ci-v">bcb4314@gmail.com</span></div>
+    <div class="ci-row"><i class="ri-phone-fill" style="color:var(--accent)"></i><span class="ci-v">+91-6393490697</span></div>
+    <div class="ci-row"><i class="ri-map-pin-2-fill" style="color:var(--blue)"></i><span class="ci-v">Gandhinagar, Gujarat, India</span></div>
+    <div class="ci-row"><i class="ri-checkbox-circle-fill" style="color:var(--accent)"></i><span class="ci-v" style="color:var(--accent)">Open to Software Engineering & AI internships</span></div>
+  </div>`;}
+
+// ═══════════════════════════════════════
+// TERMINAL
+// ═══════════════════════════════════════
+function buildTermHTML(id){return `<div class="term-body" onclick="document.getElementById('ti-${id}')?.focus()">
+  <div class="term-tabbar">
+    <div class="term-tab active">bash</div>
+    <div style="flex:1"></div>
+    <span style="font-size:9px;color:var(--muted2)">binod@portfolio:~</span>
+  </div>
+  <div class="term-out" id="to-${id}"></div>
+  <div class="term-in-row">
+    <span class="term-prompt">binod@portfolio:~$</span>
+    <input class="term-inp" id="ti-${id}" type="text" autocomplete="off" spellcheck="false" placeholder="type 'help'…" onkeydown="termKD(event,'${id}')"/>
+  </div></div>`;}
+
+const THIST={};
+const JOKES=['Why do programmers prefer dark mode? Because light attracts bugs! 🐛','How many programmers to change a light bulb? None — it\'s a hardware problem.','A SQL query walks into a bar and asks two tables: "Can I JOIN you?"','Why was the JavaScript developer sad? Didn\'t know how to null feelings.','Why do Java developers wear glasses? Because they can\'t C#.'];
+function termInit(id){
+  THIST[id]={list:[],idx:-1};
+  termPrint(id,[
+    `<span class="t-g t-bold"> ██████╗ ██╗███╗  ██╗ ██████╗ ██████╗ </span>`,
+    `<span class="t-g t-bold">██╔══██╗██║████╗ ██║██╔═══██╗██╔══██╗</span>`,
+    `<span class="t-b t-bold">██████╔╝██║██╔██╗██║██║   ██║██║  ██║</span>`,
+    `<span class="t-b t-bold">██╔══██╗██║██║╚████║██║   ██║██║  ██║</span>`,
+    `<span class="t-p t-bold">██████╔╝██║██║ ╚███║╚██████╔╝██████╔╝</span>`,``,
+    `<span class="t-m">─────────────────────────────────────</span>`,
+    `<span class="t-w">BinodOS <span class="t-g">v3.0</span> Terminal · Type <span class="t-y">help</span> to start</span>`,``,
+  ]);
+}
+function termPrint(id,lines){
+  const out=document.getElementById('to-'+id);if(!out)return;
+  lines.forEach(line=>{const d=document.createElement('div');d.innerHTML=line;out.appendChild(d);});
+  out.scrollTop=out.scrollHeight;
+}
+const CMDS=['help','whoami','ls','ls projects','ls skills','open','cat about','cat contact','social','gpa','date','pwd','clear','exit','neofetch','matrix','echo','history','uptime','weather','joke','cowsay','skills','projects'];
+function termKD(e,id){
+  const inp=document.getElementById('ti-'+id);const h=THIST[id];
+  if(e.key==='Enter'){const cmd=inp.value;inp.value='';termRun(id,cmd);}
+  else if(e.key==='ArrowUp'){e.preventDefault();if(h.idx<h.list.length-1){h.idx++;inp.value=h.list[h.idx];}}
+  else if(e.key==='ArrowDown'){e.preventDefault();if(h.idx>0){h.idx--;inp.value=h.list[h.idx];}else{h.idx=-1;inp.value='';}}
+  else if(e.key==='Tab'){e.preventDefault();const p=inp.value.toLowerCase();const m=CMDS.find(c=>c.startsWith(p)&&c!==p);if(m)inp.value=m;}
+}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function termRun(id,raw){
+  const cmd=raw.trim();const out=document.getElementById('to-'+id);
+  const echo=document.createElement('div');
+  echo.innerHTML=`<span class="t-g t-bold">binod@portfolio</span><span class="t-m">:</span><span class="t-b">~</span><span class="t-m">$</span> <span class="t-w">${esc(cmd)}</span>`;
+  out.appendChild(echo);
+  if(!cmd){out.scrollTop=out.scrollHeight;return;}
+  if(cmd)THIST[id].list.unshift(cmd);
+  const[base,...args]=cmd.toLowerCase().split(/\s+/);const arg=args.join(' ');
+  const R={
+    help:()=>[``,`<span class="t-y t-bold">Available Commands</span>`,`<span class="t-m">──────────────────────────────────────</span>`,
+      `  <span class="t-g">whoami</span>        — Who is Binod`,`  <span class="t-g">neofetch</span>      — System info`,
+      `  <span class="t-g">ls</span>            — List sections`,`  <span class="t-g">open &lt;name&gt;</span>  — Open a window`,
+      `  <span class="t-g">cat about</span>     — About info`,`  <span class="t-g">cat contact</span>   — Contact info`,
+      `  <span class="t-g">social</span>        — Social links`,`  <span class="t-g">gpa</span>           — Academic stats`,
+      `  <span class="t-g">weather</span>       — Current weather`,`  <span class="t-g">joke</span>          — Dev joke`,
+      `  <span class="t-g">date</span>          — Date & time`,`  <span class="t-g">matrix</span>        — 🐇 The Matrix`,
+      `  <span class="t-g">echo &lt;text&gt;</span>  — Print text`,`  <span class="t-g">clear</span>         — Clear terminal`,`  <span class="t-g">exit</span>          — Close`,``],
+    whoami:()=>[``,`<span class="t-b t-bold">Binod Budha</span> <span class="t-m">· MERN Stack Developer</span>`,`<span class="t-m">──────────────────────────────────</span>`,
+      `  Role     : <span class="t-w">MERN Stack Developer & CS Undergraduate</span>`,
+      `  Uni      : <span class="t-y">Pandit Deendayal Energy University</span>`,
+      `  GPA      : <span class="t-g">9.17 / 10.0</span>`,
+      `  Location : <span class="t-w">Gandhinagar, Gujarat, India</span>`,
+      `  Status   : <span class="t-g">✅ Open to internships & full-time roles</span>`,
+      `  Quote    : <span class="t-m">"Learning is better when we feel it."</span>`,``],
+    neofetch:()=>[``,
+      `<span class="t-g">  ╔══════════════════════════════╗ </span>  <span class="t-w t-bold">binod</span><span class="t-m">@</span><span class="t-w t-bold">portfolio</span>`,
+      `<span class="t-g">  ║  BinodOS v3.0               ║ </span>  <span class="t-m">OS:</span>     <span class="t-w">BinodOS v3.0</span>`,
+      `<span class="t-b">  ║  MERN · Python · AI/ML      ║ </span>  <span class="t-m">Shell:</span>  <span class="t-w">bash</span>`,
+      `<span class="t-b">  ║  GPA: 9.17/10               ║ </span>  <span class="t-m">GPA:</span>    <span class="t-g">9.17 / 10.0</span>`,
+      `<span class="t-p">  ╚══════════════════════════════╝ </span>`,``,
+      `  <span class="t-m">Stack  :</span> <span class="t-w">MERN · Python · AWS · Tailwind</span>`,
+      `  <span class="t-m">AI/ML  :</span> <span class="t-w">NLP · Groq · n8n · Prompt Eng</span>`,``],
+    ls:()=>[``,`<span class="t-y">~/portfolio/</span>`,
+      `  <span class="t-g">home</span>  <span class="t-g">about</span>  <span class="t-g">skills</span>  <span class="t-g">projects</span>  <span class="t-g">certs</span>  <span class="t-g">connect</span>`,``],
+    open:()=>{
+      const valid=['home','about','skills','projects','certs','connect','resume','terminal','weather','pomodoro','calc','settings'];
+      if(!arg)return[`<span class="t-r">Usage: open &lt;section&gt;</span>`,``];
+      if(arg==='resume'){setTimeout(()=>showResDialog(),100);return[`<span class="t-g">Opening resume dialog…</span>`,``];}
+      if(valid.includes(arg)){setTimeout(()=>openWin(arg),100);return[`<span class="t-g">Opening</span> <span class="t-w">${esc(arg)}</span> <span class="t-g">✓</span>`,``];}
+      return[`<span class="t-r">Unknown: "${esc(arg)}"</span>`,``];
+    },
+    cat:()=>{
+      if(arg==='about')return[``,`<span class="t-y">about.txt</span>`,`MERN Stack Developer & CS undergraduate.`,`Experienced with AI/ML, LLM APIs, RESTful APIs & AWS.`,``];
+      if(arg==='contact')return[``,`<span class="t-y">contact.txt</span>`,`  Email   : <span class="t-g">bcb4314@gmail.com</span>`,`  Phone   : +91-6393490697`,`  Website : <span class="t-b">budhabinod.com.np</span>`,``];
+      return[`<span class="t-r">cat: ${esc(arg)||'(no arg)'}: No such file</span>`,``];
+    },
+    social:()=>[``,`<span class="t-y">social links</span>`,
+      `  GitHub   : <span class="t-b">github.com/binod01nep</span>`,
+      `  LinkedIn : <span class="t-b">linkedin.com/in/binod-budha-7691773a1</span>`,
+      `  LeetCode : <span class="t-b">leetcode.com/u/AmBiLax</span>`,
+      `  Website  : <span class="t-b">budhabinod.com.np</span>`,``],
+    gpa:()=>[``,`  B.Tech CSE · PDEU   · <span class="t-g">9.17 / 10.0</span>`,`  Higher Secondary   · <span class="t-g">3.63 / 4.00</span>`,`  Achievement        : <span class="t-y">COMPEX Scholarship</span>`,``],
+    date:()=>[`<span class="t-w">${new Date().toLocaleString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'})}</span>`,``],
+    pwd:()=>[`<span class="t-g">/home/binod/portfolio</span>`,``],
+    uptime:()=>[`<span class="t-w">up ${Math.floor(Math.random()*72)} hours, ${Math.floor(Math.random()*60)} min</span>`,``],
+    weather:()=>[``,`<span class="t-y">weather — Gandhinagar, Gujarat</span>`,`  ⛅  29°C · Partly Cloudy`,`  Humidity: 62%  · Wind: 12 km/h`,`  UV Index: 7 (High)`,``],
+    joke:()=>[``,`<span class="t-y">joke.sh</span>`,`<span class="t-w">${JOKES[Math.floor(Math.random()*JOKES.length)]}</span>`,``],
+    cowsay:()=>{
+      const txt=esc(arg||'Moo!');const len=txt.length+2;const line='-'.repeat(len);
+      return[``,`  +${line}+`,`  | ${txt} |`,`  +${line}+`,`         \\   ^__^`,`          \\  (oo)\\_______`,`             (__)\\       )\\/\\`,`                 ||----w |`,`                 ||     ||`,``];
+    },
+    history:()=>{const h=THIST[id].list;return h.length?[``,`<span class="t-y">History</span>`,...h.slice(0,10).map((c,i)=>`  <span class="t-m">${String(i+1).padStart(3)}</span>  ${esc(c)}`),``]:[`<span class="t-m">No history yet.</span>`,``];},
+    echo:()=>arg?[`<span class="t-w">${esc(arg)}</span>`,``]:[``,``],
+    matrix:()=>{
+      const lines=[];
+      for(let i=0;i<8;i++){let row='';for(let j=0;j<52;j++)row+=`<span style="color:hsl(${138+Math.random()*16},100%,${28+Math.random()*42}%)">${String.fromCharCode(33+Math.floor(Math.random()*90))}</span>`;lines.push(row);}
+      lines.push(`<span class="t-g t-bold">Wake up, Binod… The Matrix has you.</span>`);lines.push('');return lines;
+    },
+    clear:()=>{document.getElementById('to-'+id).innerHTML='';return[];},
+    exit:()=>{setTimeout(()=>closeWin(id),200);return[`<span class="t-m">Closing terminal…</span>`];},
+  };
+  const h=R[base];
+  if(h)termPrint(id,h());
+  else termPrint(id,[`<span class="t-r">command not found: ${esc(base)}</span>`,`<span class="t-m">Type <span class="t-y">help</span> for commands.</span>`,``]);
+}
+
+// ═══════════════════════════════════════
+// WEATHER APP
+// ═══════════════════════════════════════
+const WEATHER_DATA={
+  current:{temp:29,icon:'⛅',desc:'Partly Cloudy',humidity:62,wind:12,uv:7,feels:32},
+  forecast:[
+    {day:'Mon',icon:'☀️',hi:34,lo:22},{day:'Tue',icon:'⛅',hi:31,lo:21},
+    {day:'Wed',icon:'🌧️',hi:26,lo:19},{day:'Thu',icon:'⛅',hi:29,lo:20},
+    {day:'Fri',icon:'☀️',hi:35,lo:23},{day:'Sat',icon:'🌤️',hi:32,lo:21},
+    {day:'Sun',icon:'☀️',hi:36,lo:24},
+  ]
+};
+function buildWeatherHTML(){return `<div class="wx-body">
+  <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Gandhinagar, Gujarat · IN</div>
+  <div class="wx-hero">
+    <div>
+      <div class="wx-temp-big">${WEATHER_DATA.current.temp}°<span style="font-size:28px">C</span></div>
+      <div class="wx-desc">${WEATHER_DATA.current.desc}</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:4px;">Feels like ${WEATHER_DATA.current.feels}°C</div>
+    </div>
+    <div class="wx-icon-big">${WEATHER_DATA.current.icon}</div>
+  </div>
+  <div class="wx-grid">
+    <div class="wx-card"><div class="wx-card-v">${WEATHER_DATA.current.humidity}%</div><div class="wx-card-l">Humidity</div></div>
+    <div class="wx-card"><div class="wx-card-v">${WEATHER_DATA.current.wind} km/h</div><div class="wx-card-l">Wind</div></div>
+    <div class="wx-card"><div class="wx-card-v">${WEATHER_DATA.current.uv}</div><div class="wx-card-l">UV Index</div></div>
+  </div>
+  <div class="wx-forecast">
+    <div class="wx-fc-ttl">7-Day Forecast</div>
+    <div class="wx-fc-row">
+      ${WEATHER_DATA.forecast.map(f=>`<div class="wx-fc-day">
+        <div class="wx-fc-day-n">${f.day}</div>
+        <div class="wx-fc-ico">${f.icon}</div>
+        <div class="wx-fc-hi">${f.hi}°</div>
+        <div class="wx-fc-lo">${f.lo}°</div>
+      </div>`).join('')}
+    </div>
+  </div>
+  <div style="margin-top:14px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:9px;font-size:9px;color:var(--muted);text-align:center;letter-spacing:1px;">
+    📍 Simulated weather data · Last updated: ${new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}
+  </div>
+</div>`;}
+
+// ═══════════════════════════════════════
+// POMODORO
+// ═══════════════════════════════════════
+let pomo={mode:'work',left:25*60,running:false,sessions:0,iv:null};
+const PMODES={work:{lbl:'FOCUS',mins:25,color:'var(--accent)'},short:{lbl:'SHORT BREAK',mins:5,color:'var(--blue)'},long:{lbl:'LONG BREAK',mins:15,color:'var(--purple)'}};
+function buildPomoHTML(){return `<div class="pomo-body">
+  <div class="pomo-modes">
+    <button class="pomo-mb active" id="pm-work" onclick="setPomoMode('work')">Focus</button>
+    <button class="pomo-mb" id="pm-short" onclick="setPomoMode('short')">Short Break</button>
+    <button class="pomo-mb" id="pm-long" onclick="setPomoMode('long')">Long Break</button>
+  </div>
+  <div class="pomo-ring">
+    <svg width="170" height="170" viewBox="0 0 170 170">
+      <circle class="pomo-ring-bg" cx="85" cy="85" r="78"/>
+      <circle class="pomo-ring-fill" id="pomo-rf" cx="85" cy="85" r="78" stroke-dasharray="490" stroke-dashoffset="0"/>
+    </svg>
+    <div class="pomo-center"><div class="pomo-t" id="pomo-tm">25:00</div><div class="pomo-l" id="pomo-lb">FOCUS</div></div>
+  </div>
+  <div class="pomo-ctrls">
+    <button class="pomo-cb" onclick="resetPomo()"><i class="ri-refresh-line"></i></button>
+    <button class="pomo-cb start" id="pomo-s" onclick="togglePomo()">▶ Start</button>
+    <button class="pomo-cb" onclick="skipPomo()"><i class="ri-skip-forward-fill"></i></button>
+  </div>
+  <div class="pomo-sess" id="pomo-sess">
+    <span style="font-size:9px;color:var(--muted);letter-spacing:1px;">SESSIONS:</span>
+    ${Array(4).fill(0).map(()=>'<div class="pdot"></div>').join('')}
+  </div>
+</div>`;}
+function pomodoroInit(){rendPomoRing();}
+function setPomoMode(m){
+  pomo.mode=m;pomo.left=PMODES[m].mins*60;pomo.running=false;clearInterval(pomo.iv);
+  document.querySelectorAll('.pomo-mb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('pm-'+m)?.classList.add('active');
+  rendPomoTime();rendPomoRing();
+  const s=document.getElementById('pomo-s');if(s)s.textContent='▶ Start';
+}
+function togglePomo(){
+  pomo.running=!pomo.running;const btn=document.getElementById('pomo-s');
+  if(pomo.running){
+    if(btn)btn.textContent='⏸ Pause';
+    pomo.iv=setInterval(()=>{
+      pomo.left--;rendPomoTime();rendPomoRing();
+      if(pomo.left<=0){clearInterval(pomo.iv);pomo.running=false;pomo.sessions++;rendPomoSess();showToast('🍅 Session complete! Take a break.');setPomoMode(pomo.sessions%4===0?'long':'short');}
+    },1000);
+  } else {clearInterval(pomo.iv);if(btn)btn.textContent='▶ Resume';}
+}
+function resetPomo(){clearInterval(pomo.iv);setPomoMode(pomo.mode);}
+function skipPomo(){clearInterval(pomo.iv);pomo.running=false;pomo.sessions++;rendPomoSess();setPomoMode(pomo.sessions%4===0?'long':'short');}
+function rendPomoTime(){
+  const el=document.getElementById('pomo-tm');if(!el)return;
+  const m=Math.floor(pomo.left/60),s=pomo.left%60;
+  el.textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  const l=document.getElementById('pomo-lb');if(l)l.textContent=PMODES[pomo.mode].lbl;
+}
+function rendPomoRing(){
+  const f=document.getElementById('pomo-rf');if(!f)return;
+  const total=PMODES[pomo.mode].mins*60;const pct=pomo.left/total;
+  f.style.strokeDashoffset=490*(1-pct);f.style.stroke=PMODES[pomo.mode].color;
+}
+function rendPomoSess(){
+  const el=document.getElementById('pomo-sess');if(!el)return;
+  let h='<span style="font-size:9px;color:var(--muted);letter-spacing:1px;">SESSIONS: </span>';
+  for(let i=0;i<Math.min(8,Math.max(4,pomo.sessions+2));i++)h+=`<div class="pdot${i<pomo.sessions?' done':''}"></div>`;
+  el.innerHTML=h;
+}
+
+// ═══════════════════════════════════════
+// CALCULATOR
+// ═══════════════════════════════════════
+let cDisp='0',cHist='',cOp=null,cPrev=null,cNew=true;
+function buildCalcHTML(){return `<div class="calc-body">
+  <div class="calc-disp"><div class="calc-hist" id="chist"></div><div class="calc-val" id="cval">0</div></div>
+  <div class="calc-grid">
+    ${[['AC','clr',false],['±','op',false],['%','op',false],['÷','op',false],
+       ['7',null,false],['8',null,false],['9',null,false],['×','op',false],
+       ['4',null,false],['5',null,false],['6',null,false],['−','op',false],
+       ['1',null,false],['2',null,false],['3',null,false],['+','op',false],
+       ['0',null,true],['.','dot',false],['=','eq',false]
+    ].map(([l,cls,wide])=>`<button class="cb${cls?' '+cls:''}" ${wide?'style="grid-column:span 2"':''} onclick="cPress('${l}')">${l}</button>`).join('')}
+  </div>
+</div>`;}
+function calcInit(){updCalc();}
+function updCalc(){const v=document.getElementById('cval');if(v)v.textContent=cDisp;const h=document.getElementById('chist');if(h)h.textContent=cHist;}
+function cPress(k){
+  if(k==='AC'){cDisp='0';cHist='';cOp=null;cPrev=null;cNew=true;}
+  else if(k==='±'){cDisp=String(-parseFloat(cDisp));}
+  else if(k==='%'){cDisp=String(parseFloat(cDisp)/100);}
+  else if(['÷','×','−','+'].includes(k)){cPrev=parseFloat(cDisp);cOp=k;cHist=cDisp+' '+k;cNew=true;}
+  else if(k==='='){
+    if(cOp&&cPrev!=null){
+      const n=parseFloat(cDisp);let r=cPrev;
+      if(cOp==='÷')r/=n;else if(cOp==='×')r*=n;else if(cOp==='−')r-=n;else if(cOp==='+')r+=n;
+      cHist=cPrev+' '+cOp+' '+cDisp+' =';
+      cDisp=String(parseFloat(r.toFixed(10)));cOp=null;cPrev=null;cNew=true;
+    }
+  }
+  else if(k==='.'){if(!cDisp.includes('.'))cDisp+='.';cNew=false;}
+  else{if(cNew||cDisp==='0')cDisp=k;else cDisp+=k;cNew=false;}
+  updCalc();
+}
+document.addEventListener('keydown',e=>{
+  if(!wins['calc'])return;
+  const m={'0':'0','1':'1','2':'2','3':'3','4':'4','5':'5','6':'6','7':'7','8':'8','9':'9','Enter':'=','Backspace':'AC','+':'+','-':'−','*':'×','/':'÷','.':'.'};
+  if(m[e.key])cPress(m[e.key]);
+});
+
+// ═══════════════════════════════════════
+// RESUME
+// ═══════════════════════════════════════
+function buildResumeHTML(){return `<div class="rv-body">
+  <div class="rv-tb">
+    <div style="display:flex;align-items:center;gap:7px;"><i class="ri-file-pdf-line" style="color:var(--red);font-size:14px;"></i><span style="font-size:10px;color:var(--muted)">BinodBudhaResume.pdf</span></div>
+    <div style="display:flex;gap:5px;">
+      <button class="rv-btn" onclick="dlResume()"><i class="ri-download-2-line"></i> Download</button>
+      <button class="rv-btn" onclick="maxWin('resume')"><i class="ri-fullscreen-line"></i> Fullscreen</button>
+    </div>
+  </div>
+  <div class="rv-embed" id="rv-embed">
+    <div class="rv-fallback" id="rv-fb">
+      <i class="ri-file-pdf-line"></i>
+      <p>Place <strong style="color:var(--text)">BinodBudhaResume.pdf</strong> in the same folder.<br/>Or open it directly.</p>
+      <a href="/BinodBudhaResume.pdf" target="_blank" style="color:var(--accent);text-decoration:none;font-size:11px;">Open in new tab ↗</a>
+      <button onclick="dlResume()" style="background:var(--accent);color:#000;border:none;border-radius:7px;padding:7px 16px;font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">⬇ Download PDF</button>
+    </div>
+  </div></div>`;}
+function initResume(){
+  const wrap=document.getElementById('rv-embed');if(!wrap)return;
+  const obj=document.createElement('object');obj.data='BinodBudhaResume.pdf';obj.type='application/pdf';
+  obj.style.cssText='position:absolute;inset:0;width:100%;height:100%;border:none;z-index:1;';
+  wrap.appendChild(obj);
+}
+function showResDialog(){
+  const ov=document.createElement('div');ov.className='res-ov';ov.id='res-ov';
+  ov.innerHTML=`<div class="res-modal"><h3>📄 Resume</h3><p>How would you like to view Binod's resume?</p><div class="res-choices"><button class="res-btn" onclick="viewResDesk()"><i class="ri-computer-line"></i><div><div class="res-btn-l">View in Desktop</div><div class="res-btn-s">Opens inside this OS window</div></div></button><button class="res-btn" onclick="dlResume()"><i class="ri-download-2-line"></i><div><div class="res-btn-l">Download PDF</div><div class="res-btn-s">Saves to your device</div></div></button></div><button class="res-cancel" onclick="document.getElementById('res-ov').remove()">Cancel</button></div>`;
+  document.body.appendChild(ov);
+}
+function viewResDesk(){document.getElementById('res-ov')?.remove();openWin('resume');}
+function dlResume(){document.getElementById('res-ov')?.remove();showToast('📄 Downloading resume…');const a=document.createElement('a');a.href='/BinodBudhaResume.pdf';a.download='BinodBudha_Resume.pdf';a.click();}
+
+// ═══════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════
+function buildSettingsHTML(){return `<div class="set-lay" style="flex:1;">
+  <div class="set-nav">
+    <div class="set-nav-i active" onclick="setNav(this,'appearance')"><i class="ri-palette-line"></i>Appearance</div>
+    <div class="set-nav-i" onclick="setNav(this,'wallpaper')"><i class="ri-image-line"></i>Wallpaper</div>
+    <div class="set-nav-i" onclick="setNav(this,'typography')"><i class="ri-font-size"></i>Typography</div>
+    <div class="set-nav-i" onclick="setNav(this,'system')"><i class="ri-computer-line"></i>System</div>
+    <div class="set-nav-i" onclick="setNav(this,'keyboard')"><i class="ri-keyboard-line"></i>Shortcuts</div>
+    <div class="set-nav-i" onclick="setNav(this,'about')"><i class="ri-information-line"></i>About</div>
+  </div>
+  <div class="set-content" id="set-content"></div>
+</div>`;}
+function initSettings(){rendSetPane('appearance');}
+function setNav(el,p){
+  document.querySelectorAll('.set-nav-i').forEach(e=>e.classList.remove('active'));
+  el.classList.add('active');rendSetPane(p);
+}
+
+// temp font preview storage (applied only on "Make Changes")
+let tempFont={...pendingFont};
+
+function rendSetPane(p){
+  const c=document.getElementById('set-content');if(!c)return;
+  if(p==='appearance')c.innerHTML=`
+    <div class="set-sec"><div class="set-sec-t">Accent Color</div>
+      <div class="set-row"><div><div class="set-row-l">Primary Accent</div><div class="set-row-s">Used for highlights & active states</div></div>
+        <div class="ac-picker">${[['#00ff88','Neon Green'],['#00d4ff','Cyber Blue'],['#a855f7','Electric Purple'],['#ff8c42','Neon Orange'],['#ffd700','Gold'],['#ff3d6b','Hot Red'],['#00ffcc','Mint'],['#ff6ec7','Pink']].map(([col,n])=>`<div class="ac-sw" style="background:${col}" onclick="setAccent('${col}',this)" title="${n}"></div>`).join('')}</div>
+      </div>
+    </div>
+    <div class="set-sec"><div class="set-sec-t">Interface Effects</div>
+      <div class="set-row"><div><div class="set-row-l">Scanlines Effect</div><div class="set-row-s">CRT screen scanlines</div></div><button class="toggle on" onclick="this.classList.toggle('on');document.getElementById('scan-el').style.display=this.classList.contains('on')?'block':'none'"></button></div>
+      <div class="set-row"><div><div class="set-row-l">Particle Network</div><div class="set-row-s">Animated background particles</div></div><button class="toggle on" onclick="this.classList.toggle('on');document.getElementById('bg-canvas').style.opacity=this.classList.contains('on')?'1':'0'"></button></div>
+      <div class="set-row"><div><div class="set-row-l">Grid Overlay</div><div class="set-row-s">Subtle background grid</div></div><button class="toggle on" onclick="this.classList.toggle('on');document.getElementById('grid-el').style.opacity=this.classList.contains('on')?'1':'0'"></button></div>
+      <div class="set-row"><div><div class="set-row-l">Vignette</div><div class="set-row-s">Darkened edges</div></div><button class="toggle on" onclick="this.classList.toggle('on');document.querySelector('.vignette').style.opacity=this.classList.contains('on')?'1':'0'"></button></div>
+    </div>`;
+  else if(p==='wallpaper')c.innerHTML=`
+    <div class="set-sec"><div class="set-sec-t">Choose Wallpaper</div>
+      <div class="wp-grid">${WPS.map(wp=>`
+        <div class="wp-th ${curWP===wp.id?'active':''}" onclick="applyWP('${wp.id}','');sessionStorage.setItem('bos-wp',JSON.stringify({id:'${wp.id}',url:''}));document.querySelectorAll('.wp-th').forEach(t=>t.classList.remove('active'));this.classList.add('active');showToast('🖼️ Wallpaper: ${wp.label}');">
+          ${wp.value?`<div style="width:100%;height:100%;background:${wp.value};border-radius:5px;"></div>`:`<div style="width:100%;height:100%;background:var(--bg);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:20px;">🖥️</div>`}
+          <div class="wp-l">${wp.label}</div>
+        </div>`).join('')}
+      </div>
+      <label class="wp-up"><i class="ri-upload-cloud-line" style="font-size:16px;"></i><span>Upload Custom Image</span><input type="file" accept="image/*" style="display:none;" onchange="handleWPUp(event)"/></label>
+    </div>
+    <div class="set-sec"><div class="set-sec-t">Wallpaper Effects</div>
+      <div class="set-row"><div><div class="set-row-l">Blur</div></div><input type="range" class="rng" min="0" max="20" value="${wpBlur}" oninput="wpBlur=this.value;applyWPFX();this.nextElementSibling.textContent=this.value+'px'"/><span style="font-size:9px;color:var(--muted);min-width:26px">${wpBlur}px</span></div>
+      <div class="set-row"><div><div class="set-row-l">Brightness</div></div><input type="range" class="rng" min="0.2" max="1.5" step="0.05" value="${wpBright}" oninput="wpBright=this.value;applyWPFX();this.nextElementSibling.textContent=parseFloat(this.value).toFixed(2)"/><span style="font-size:9px;color:var(--muted);min-width:26px">${wpBright}</span></div>
+      <div class="set-row"><div><div class="set-row-l">Opacity</div></div><input type="range" class="rng" min="0.1" max="1" step="0.05" value="${wpOpacity}" oninput="wpOpacity=this.value;applyWPFX();this.nextElementSibling.textContent=parseFloat(this.value).toFixed(2)"/><span style="font-size:9px;color:var(--muted);min-width:26px">${wpOpacity}</span></div>
+    </div>`;
+  else if(p==='typography'){
+    // Typography settings pane
+    c.innerHTML=`
+    <div class="set-sec"><div class="set-sec-t">Font Settings</div>
+      <div style="padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:11px;margin-bottom:10px;">
+        <div style="font-size:9px;color:var(--muted);letter-spacing:1px;margin-bottom:6px;">PREVIEW</div>
+        <div id="font-preview" style="font-size:14px;line-height:1.8;transition:all .3s;">The quick brown fox jumps over the lazy dog. 0123456789</div>
+      </div>
+      <div class="set-row" style="flex-direction:column;align-items:flex-start;gap:8px;">
+        <div class="set-row-l">Font Family</div>
+        <select id="font-family-sel" onchange="previewFont()" style="width:100%;background:var(--surface3);color:var(--text);border:1px solid var(--border2);border-radius:7px;padding:7px 10px;font-size:11px;outline:none;cursor:pointer;">
+          <option value="'JetBrains Mono',monospace">JetBrains Mono (Default)</option>
+          <option value="'Fira Code',monospace">Fira Code</option>
+          <option value="'Syne',sans-serif">Syne</option>
+          <option value="'Space Grotesk',sans-serif">Space Grotesk</option>
+          <option value="'Outfit',sans-serif">Outfit</option>
+          <option value="'Raleway',sans-serif">Raleway</option>
+          <option value="'Playfair Display',serif">Playfair Display</option>
+        </select>
+      </div>
+      <div class="set-row" style="flex-direction:column;align-items:flex-start;gap:8px;margin-top:5px;">
+        <div class="set-row-l">Font Weight</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          ${[['300','Light'],['400','Regular'],['500','Medium'],['600','Semi Bold'],['700','Bold']].map(([w,l])=>`<button id="fw-${w}" onclick="selFontWeight('${w}')" style="background:var(--surface3);border:1px solid var(--border2);border-radius:7px;padding:5px 12px;font-size:10px;color:var(--muted);cursor:pointer;transition:all .15s;font-weight:${w};">${l}</button>`).join('')}
+        </div>
+      </div>
+      <div class="set-row" style="flex-direction:column;align-items:flex-start;gap:8px;margin-top:5px;">
+        <div class="set-row-l">Font Color</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          ${[['#ddeeff','Default (Ice White)'],['#ffffff','Pure White'],['#c8d8e8','Cool Blue'],['#e8e8d8','Warm Cream'],['#d8f0d8','Soft Mint'],['#f0d8d8','Rose'],['#00ff88','Neon Green'],['#00d4ff','Cyber Blue']].map(([col,lbl])=>`<div onclick="selFontColor('${col}',this)" title="${lbl}" style="width:22px;height:22px;border-radius:50%;background:${col};cursor:pointer;border:2px solid transparent;transition:all .15s;" class="fc-sw"></div>`).join('')}
+          <input type="color" id="font-color-custom" value="#ddeeff" onchange="selFontColor(this.value,null)" style="width:32px;height:32px;border-radius:50%;border:1px solid var(--border2);cursor:pointer;background:none;padding:0;" title="Custom color"/>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:12px;">
+      <button onclick="applyTypography()" style="background:linear-gradient(135deg,var(--accent),var(--blue));color:#000;border:none;border-radius:10px;padding:10px 24px;font-family:'Syne',sans-serif;font-size:12px;font-weight:800;cursor:pointer;letter-spacing:.5px;transition:all .2s;width:100%;">
+        ✓ Make Changes
+      </button>
+      <div style="text-align:center;margin-top:7px;font-size:9px;color:var(--muted2);">Changes apply to the entire desktop interface</div>
+    </div>`;
+    // Set current selections
+    setTimeout(()=>{
+      const sel=document.getElementById('font-family-sel');
+      if(sel){for(let o of sel.options){if(o.value===pendingFont.family){o.selected=true;break;}}}
+      const fw=pendingFont.weight||'400';const btn=document.getElementById('fw-'+fw);
+      if(btn){btn.style.borderColor='var(--accent)';btn.style.color='var(--accent)';}
+      // mark color swatch
+      document.querySelectorAll('.fc-sw').forEach(s=>{if(s.style.background===pendingFont.color||s.title.includes(pendingFont.color))s.style.borderColor='white';});
+      previewFont();
+    },10);
+  }
+  else if(p==='system')c.innerHTML=`
+    <div class="set-sec"><div class="set-sec-t">System Info</div>
+      <div class="set-row"><div class="set-row-l">OS Version</div><div style="font-size:10px;color:var(--accent)">BinodOS v3.0</div></div>
+      <div class="set-row"><div class="set-row-l">Platform</div><div style="font-size:10px;color:var(--muted)">${navigator.platform||'Unknown'}</div></div>
+      <div class="set-row"><div class="set-row-l">Online Status</div><div style="font-size:10px;color:${navigator.onLine?'var(--accent)':'var(--red)'}">${navigator.onLine?'Connected':'Offline'}</div></div>
+      <div class="set-row"><div class="set-row-l">Screen</div><div style="font-size:10px;color:var(--muted)">${window.screen.width} × ${window.screen.height}</div></div>
+      <div class="set-row"><div class="set-row-l">Language</div><div style="font-size:10px;color:var(--muted)">${navigator.language}</div></div>
+    </div>
+    <div class="set-sec"><div class="set-sec-t">Actions</div>
+      <div class="set-row"><div><div class="set-row-l">Lock Screen</div></div><button class="btn-s" style="padding:5px 12px;font-size:9px;" onclick="showLock()">Lock →</button></div>
+      <div class="set-row"><div><div class="set-row-l">Sign Out</div></div><button style="background:var(--red);color:#fff;border:none;border-radius:7px;padding:5px 12px;font-size:9px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;" onclick="showLogout()">Sign Out →</button></div>
+    </div>`;
+  else if(p==='keyboard')c.innerHTML=`
+    <div class="set-sec"><div class="set-sec-t">Keyboard Shortcuts</div>
+      ${[['Ctrl/⌘ + K','Open Spotlight Search'],['H','Open Home'],['T','Open Terminal'],['P','Open Projects'],['S','Open Skills'],['C','Open Connect'],['Esc','Close Spotlight / Context Menu'],['Double-click icon','Open application']].map(([k,d])=>`
+        <div class="set-row"><div class="set-row-l">${d}</div><span class="kbd">${k}</span></div>`).join('')}
+    </div>`;
+  else c.innerHTML=`
+    <div class="set-sec">
+      <div style="text-align:center;padding:18px;">
+        <div style="font-size:44px;margin-bottom:10px;">💻</div>
+        <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text)">BinodOS v3.0</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:5px">Built with HTML · CSS · Vanilla JS</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px">Designed & developed by <span style="color:var(--accent)">Binod Budha</span></div>
+        <div style="margin-top:14px;display:flex;gap:7px;justify-content:center;flex-wrap:wrap;">
+          <a href="https://github.com/binod01nep" target="_blank" class="btn-s" style="text-decoration:none;display:inline-flex;align-items:center;gap:4px;padding:7px 14px;font-size:10px;"><i class="ri-github-fill"></i> GitHub</a>
+          <a href="https://budhabinod.com.np" target="_blank" class="btn-s" style="text-decoration:none;display:inline-flex;align-items:center;gap:4px;padding:7px 14px;font-size:10px;"><i class="ri-global-line"></i> Website</a>
+          <button class="btn-s" style="padding:7px 14px;font-size:10px;" onclick="showResDialog()"><i class="ri-file-pdf-line"></i> Resume</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── Font preview / selection helpers ──
+function previewFont(){
+  const sel=document.getElementById('font-family-sel');if(!sel)return;
+  const prev=document.getElementById('font-preview');if(!prev)return;
+  tempFont.family=sel.value;
+  prev.style.fontFamily=tempFont.family;
+  prev.style.fontWeight=tempFont.weight||'400';
+  prev.style.color=tempFont.color||'#ddeeff';
+}
+function selFontWeight(w){
+  tempFont.weight=w;
+  document.querySelectorAll('[id^="fw-"]').forEach(b=>{b.style.borderColor='var(--border2)';b.style.color='var(--muted)';});
+  const btn=document.getElementById('fw-'+w);if(btn){btn.style.borderColor='var(--accent)';btn.style.color='var(--accent)';}
+  previewFont();
+}
+function selFontColor(col,el){
+  tempFont.color=col;
+  document.querySelectorAll('.fc-sw').forEach(s=>s.style.borderColor='transparent');
+  if(el)el.style.borderColor='white';
+  previewFont();
+}
+function applyTypography(){
+  applyFontSettings(tempFont.family,tempFont.weight||'400',tempFont.color||'#ddeeff');
+  showToast('✅ Font settings applied across desktop!');
+}
+
+function handleWPUp(e){
+  const file=e.target.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=ev=>{customWP=ev.target.result;applyWP('custom',customWP);sessionStorage.setItem('bos-wp',JSON.stringify({id:'custom',url:customWP}));showToast('🖼️ Custom wallpaper applied!');document.querySelectorAll('.wp-th').forEach(t=>t.classList.remove('active'));};
+  r.readAsDataURL(file);
+}
+function setAccent(col,el){
+  setAccentDirect(col);
+  document.querySelectorAll('.ac-sw').forEach(s=>s.classList.remove('active'));
+  if(el)el.classList.add('active');
+  sessionStorage.setItem('bos-accent',col);
+  showToast('✅ Accent updated!');
+}
+function setAccentDirect(col){document.documentElement.style.setProperty('--accent',col);document.documentElement.style.setProperty('--green',col);}
+
+// ═══════════════════════════════════════
+// WINDOW MANAGEMENT
+// ═══════════════════════════════════════
+function bringFront(id){
+  zTop++;const w=wins[id];if(w)w.el.style.zIndex=zTop;
+  document.querySelectorAll('.tb-pill').forEach(p=>p.classList.remove('active'));
+  document.querySelector(`.tb-pill[data-id="${id}"]`)?.classList.add('active');
+  updDockBadges();
+}
+function closeWin(id){
+  const w=wins[id];if(!w)return;
+  w.el.style.animation='winClose .14s ease forwards';w.el.style.pointerEvents='none';
+  setTimeout(()=>{w.el.remove();delete wins[id];document.querySelector(`.tb-pill[data-id="${id}"]`)?.remove();updDockBadges();},140);
+}
+function minWin(id){const w=wins[id];if(!w)return;w.el.classList.add('minimized');w.min=true;document.querySelector(`.tb-pill[data-id="${id}"]`)?.classList.remove('active');}
+function unmin(id){const w=wins[id];if(!w)return;w.el.classList.remove('minimized');w.min=false;bringFront(id);}
+function maxWin(id){
+  const w=wins[id];if(!w)return;
+  if(w.max){w.el.style.left=w._px;w.el.style.top=w._py;w.el.style.width=w._pw;w.el.style.height=w._ph;w.el.style.borderRadius='';w.max=false;}
+  else{w._px=w.el.style.left;w._py=w.el.style.top;w._pw=w.el.style.width;w._ph=w.el.style.height;w.el.style.cssText+=';left:0;top:0;width:calc(100vw - var(--dock-w));height:calc(100vh - var(--taskbar-h));border-radius:0;';bringFront(id);w.max=true;}
+}
+function addPill(id,title){
+  const pill=document.createElement('div');pill.className='tb-pill active';pill.dataset.id=id;
+  pill.innerHTML=`<div class="pdot"></div>${title.replace(/^[^\s]+\s/,'').slice(0,12)}`;
+  pill.onclick=()=>{if(wins[id]?.min)unmin(id);else bringFront(id);};
+  document.getElementById('tbtabs').appendChild(pill);
+}
+function updDockBadges(){
+  const open=Object.keys(wins);
+  document.querySelectorAll('.di').forEach(el=>{const id=el.id.replace('di-','');if(open.includes(id))el.classList.add('active-app');else el.classList.remove('active-app');});
+}
+
+// ═══════════════════════════════════════
+// DRAG & RESIZE
+// ═══════════════════════════════════════
+function startDrag(e,id){
+  if(e.target.closest('.wd'))return;
+  const win=document.getElementById('w-'+id);if(wins[id]?.max)return;
+  const sx=e.clientX-win.offsetLeft,sy=e.clientY-win.offsetTop;
+  const mv=e=>{const nx=e.clientX-sx,ny=Math.max(0,e.clientY-sy);win.style.left=nx+'px';win.style.top=ny+'px';};
+  const up=()=>{document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);};
+  document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);
+}
+function startResize(e,id,dir){
+  e.preventDefault();e.stopPropagation();
+  const win=document.getElementById('w-'+id);if(wins[id]?.max)return;
+  const sx=e.clientX,sy=e.clientY,sw=win.offsetWidth,sh=win.offsetHeight;
+  const mv=e=>{
+    if(dir==='se'||dir==='e')win.style.width=Math.max(300,sw+(e.clientX-sx))+'px';
+    if(dir==='se'||dir==='s')win.style.height=Math.max(200,sh+(e.clientY-sy))+'px';
+  };
+  const up=()=>{document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);};
+  document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);
+}
+
+// ═══════════════════════════════════════
+// CONTEXT MENU — only 6 most important
+// ═══════════════════════════════════════
+let ctxEl=null;
+function closeCtx(){if(ctxEl){ctxEl.remove();ctxEl=null;}}
+document.getElementById('desktop').addEventListener('contextmenu',e=>{
+  if(e.target.closest('.win')||e.target.closest('.di'))return;
+  e.preventDefault();closeCtx();
+  const m=document.createElement('div');m.className='ctx';
+  const maxH=window.innerHeight-20;const topPos=Math.min(e.clientY,maxH-260);
+  m.style.cssText=`left:${Math.min(e.clientX,window.innerWidth-210)}px;top:${Math.max(0,topPos)}px;`;
+  m.innerHTML=`
+    <div class="ctx-i" onclick="openWin('home')"><i class="ri-home-line"></i>Home<span class="ckbd">H</span></div>
+    <div class="ctx-i" onclick="openWin('projects')"><i class="ri-code-box-line"></i>Projects<span class="ckbd">P</span></div>
+    <div class="ctx-i" onclick="openWin('terminal')"><i class="ri-terminal-box-line"></i>Terminal<span class="ckbd">T</span></div>
+    <div class="ctx-sep"></div>
+    <div class="ctx-i" onclick="openSpotlight()"><i class="ri-search-line"></i>Spotlight<span class="ckbd">⌘K</span></div>
+    <div class="ctx-i" onclick="openWin('settings')"><i class="ri-settings-4-line"></i>Settings</div>
+    <div class="ctx-sep"></div>
+    <div class="ctx-i danger" onclick="showLogout()"><i class="ri-logout-box-line"></i>Sign Out</div>`;
+  document.body.appendChild(m);ctxEl=m;
+  setTimeout(()=>document.addEventListener('click',closeCtx,{once:true}),50);
+});
+
+// ═══════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════
+let toastT;
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+// ═══════════════════════════════════════
+// KEYBOARD SHORTCUTS
+// ═══════════════════════════════════════
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('desktop').style.display!=='block')return;
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
+  if(document.getElementById('spotlight'))return;
+  if(e.key==='t'||e.key==='T')openWin('terminal');
+  else if(e.key==='h'||e.key==='H')openWin('home');
+  else if(e.key==='p'||e.key==='P')openWin('projects');
+  else if(e.key==='s'||e.key==='S')openWin('skills');
+  else if(e.key==='c'||e.key==='C')openWin('connect');
+  else if(e.key==='Escape')closeCtx();
+});
+
+// AUTO OPEN HOME on boot
+setTimeout(()=>{if(document.getElementById('desktop').style.display==='block')openWin('home');},4000);
+</script>
+</body>
+</html>
