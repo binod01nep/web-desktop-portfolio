@@ -68,7 +68,6 @@
 | 🏆 **Certificates** | Grid of verified credentials (Kaggle, Google DeepMind) |
 | 📡 **Connect** | Social links, contact info, resume access |
 | ⌨️ **Terminal** | Fully functional bash-like terminal with 20+ commands |
-| 🌤️ **Weather** | Simulated weather widget for Gandhinagar, Gujarat |
 | 🍅 **Pomodoro** | SVG ring timer with Focus / Short Break / Long Break modes |
 | 🧮 **Calculator** | Fully functional calculator with keyboard support |
 | 📄 **Resume** | PDF viewer + download dialog |
@@ -112,8 +111,6 @@ echo        matrix      clear       exit
 ├── index.html              # Entire portfolio (single-file)
 ├── image.png               # Profile photo
 ├── BinodBudhaResume.pdf    # Resume for viewer/download
-├── Kaggle_certificate.png  # Kaggle ML Certificate image
-└── python.png              # Kaggle Python Certificate image
 ```
 
 ---
