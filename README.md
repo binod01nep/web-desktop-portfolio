@@ -1,4 +1,4 @@
-# 🖥️ BinodOS 3.0 — Portfolio OS(for desktop users only)
+# 🖥️ BinodOS — Portfolio OS(for desktop users only)
 
 > An interactive, OS-themed personal portfolio built entirely with **HTML · CSS · Vanilla JS** — no frameworks, no dependencies.
 
@@ -175,5 +175,5 @@ This project is open source and available under the [MIT License](LICENSE).
 ---
 
 <div align="center">
-  <sub>Built with ❤️ using AI & creativity · BinodOS v3.0</sub>
+  <sub>Built with ❤️ using AI & creativity · Binod Budha</sub>
 </div>
