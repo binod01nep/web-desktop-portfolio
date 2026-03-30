@@ -13,7 +13,7 @@
 
 ## 🚀 Live Demo
 
-🌐 [budhabinod.com.np](https://budhabinod.com.np)
+🌐 [budhabinod.com.np](https://binodos.netlify.app)
 
 ---
 
