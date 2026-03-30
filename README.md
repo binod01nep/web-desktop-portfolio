@@ -7,11 +7,39 @@
 ![CSS](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 
+> 💡 **Built with the help of AI & my creativity** — a fusion of intelligent tooling and personal design vision.
+
 ---
 
 ## 🚀 Live Demo
 
 🌐 [budhabinod.com.np](https://budhabinod.com.np)
+
+---
+
+## 📸 Screenshots
+
+### 🔐 Login Screen
+<!-- Paste your login screen screenshot below -->
+![Login Screen](screenshots/login.png)
+
+### 🖥️ Desktop
+<!-- Paste your desktop screenshot below -->
+![Desktop](screenshots/desktop.png)
+
+### 📦 Apps in Action
+<!-- Paste your apps/windows screenshot below -->
+![Apps](screenshots/apps.png)
+
+### ⌨️ Terminal
+<!-- Paste your terminal screenshot below -->
+![Terminal](screenshots/terminal.png)
+
+### ⚙️ Settings
+<!-- Paste your settings screenshot below -->
+![Settings](screenshots/settings.png)
+
+> 📌 **How to add screenshots:** Create a `screenshots/` folder in the root directory and place your demo images there, or replace the paths above with direct URLs to your hosted images.
 
 ---
 
@@ -147,20 +175,6 @@ Password: **`binod`**
 
 ---
 
-## 🧑‍💻 About the Developer
-
-**Binod Budha**
-MERN Stack Developer & CS Undergraduate @ PDEU (GPA: 9.17/10)
-Gandhinagar, Gujarat, India
-
-- 📧 bcb4314@gmail.com
-- 💼 [LinkedIn](https://www.linkedin.com/in/binod-budha-7691773a1/)
-- 🐙 [GitHub](https://github.com/binod01nep)
-- 🏆 [LeetCode](https://leetcode.com/u/AmBiLax/)
-- 🌐 [budhabinod.com.np](https://budhabinod.com.np)
-
----
-
 ## 📄 License
 
 This project is open source and available under the [MIT License](LICENSE).
@@ -168,5 +182,5 @@ This project is open source and available under the [MIT License](LICENSE).
 ---
 
 <div align="center">
-  <sub>Built with ❤️ by Binod Budha · BinodOS v3.0</sub>
+  <sub>Built with ❤️ using AI & creativity · BinodOS v3.0</sub>
 </div>
