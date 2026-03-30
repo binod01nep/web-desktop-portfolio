@@ -35,7 +35,7 @@
 <!-- Paste your settings screenshot below -->
 ![Settings](screenshots/settings.png)
 
-> 📌 **How to add screenshots:** Create a `screenshots/` folder in the root directory and place your demo images there, or replace the paths above with direct URLs to your hosted images.
+>
 
 ---
 
