@@ -445,7 +445,7 @@ body{font-family:var(--ui-font);background:var(--bg);color:var(--ui-font-color);
 #cal-popup.open{display:block;}
 .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .cal-month-lbl{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);}
-.cal-nav{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:3px 7px;border-radius:6px;transition:all .15s;}
+.cal-nav{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:3px 7px;border-radius:6px;transition:all .15px;}
 .cal-nav:hover{background:var(--surface2);color:var(--text);}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
 .cal-day-name{font-size:8px;color:var(--muted2);text-align:center;padding:3px 0;letter-spacing:.5px;}
@@ -605,7 +605,8 @@ const WPS=[
   {id:'cyber',label:'Cyber',value:'linear-gradient(135deg,#000408 0%,#000e1c 40%,#000a15 100%)',preview:'linear-gradient(135deg,#000408,#000e1c,#000a15)'},
   {id:'crimson',label:'Crimson',value:'linear-gradient(135deg,#0a0205 0%,#1a0208 30%,#1a0505 60%,#0a0202 100%)',preview:'linear-gradient(135deg,#0a0205,#1a0208,#0a0202)'},
 ];
-let curWP='none',customWP='',wpBlur=0,wpBright=1,wpOpacity=1;
+// ── CHANGE: default wallpaper is now 'sunset' ──
+let curWP='sunset',customWP='',wpBlur=0,wpBright=1,wpOpacity=1;
 function applyWP(id,url){
   curWP=id;const el=document.getElementById('wp-img');
   const wp=WPS.find(w=>w.id===id);
@@ -619,6 +620,8 @@ function applyWPFX(){
   const f=[];if(wpBlur>0)f.push(`blur(${wpBlur}px)`);if(wpBright!==1)f.push(`brightness(${wpBright})`);
   el.style.filter=f.join(' ');el.style.opacity=wpOpacity;
 }
+// Apply sunset wallpaper immediately on page load
+applyWP('sunset','');
 
 // ═══════════════════════════════════════
 // LOGIN
@@ -641,7 +644,9 @@ function doLogin(){
       document.getElementById('desktop').style.display='block';
       document.getElementById('taskbar').style.display='flex';
       spawnParticles();updTray();startStats();startWClk();
-      const sw=sessionStorage.getItem('bos-wp');if(sw){const d=JSON.parse(sw);applyWP(d.id,d.url);customWP=d.url||'';}
+      const sw=sessionStorage.getItem('bos-wp');
+      if(sw){const d=JSON.parse(sw);applyWP(d.id,d.url);customWP=d.url||'';}
+      else{applyWP('sunset','');}  // default to sunset if no saved preference
       const sa=sessionStorage.getItem('bos-accent');if(sa)setAccentDirect(sa);
       // restore font settings
       const sf=sessionStorage.getItem('bos-font');if(sf){const fd=JSON.parse(sf);applyFontSettings(fd.family,fd.weight,fd.color);}
