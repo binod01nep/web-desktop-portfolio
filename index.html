@@ -20,7 +20,6 @@
   --shadow:0 40px 120px rgba(0,0,0,0.95),0 0 0 1px rgba(0,255,136,0.04),0 0 80px rgba(0,0,0,0.6);
   --accent:#00ff88;--accent-glow:rgba(0,255,136,0.18);
   --dock-w:0px;--taskbar-h:44px;
-  /* Font customization */
   --ui-font:'JetBrains Mono',monospace;
   --ui-font-weight:400;
   --ui-font-color:#ddeeff;
@@ -116,7 +115,6 @@ body{font-family:var(--ui-font);background:var(--bg);color:var(--ui-font-color);
 .widget{background:rgba(9,13,21,.84);border:1px solid var(--border2);border-radius:16px;padding:14px 16px;backdrop-filter:blur(24px);transition:border-color .2s,transform .2s;}
 .widget:hover{border-color:var(--border3);transform:translateY(-1px);}
 .wt{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;font-weight:600;}
-.note-inp{width:100%;background:transparent;border:none;outline:none;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:10px;resize:none;line-height:1.9;user-select:text;cursor:text;}
 .clk-time{font-family:'Syne',sans-serif;font-size:38px;font-weight:800;color:var(--text);letter-spacing:-2px;line-height:1;}
 .clk-date{font-size:9px;color:var(--muted);margin-top:3px;letter-spacing:2px;}
 .clk-ampm{font-size:13px;color:var(--accent);font-weight:700;margin-left:3px;}
@@ -455,7 +453,166 @@ body{font-family:var(--ui-font);background:var(--bg);color:var(--ui-font-color);
 .cal-day.other-month{opacity:.3;}
 .cal-day.empty{pointer-events:none;}
 
-/* ═══ RESPONSIVE FIXES ═══ */
+/* ═══════════════════════════════════════
+   MOBILE STYLES
+═══════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* ── Mobile Desktop ── */
+  #desktop-icons {
+    left: 0; top: 0;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: auto;
+    gap: 0;
+    padding: 16px 8px 8px;
+    /* Remove terminal icon from mobile grid via JS */
+  }
+
+  .dsk-icon {
+    width: 100%;
+    height: auto;
+    padding: 12px 4px;
+    border-radius: 10px;
+    gap: 6px;
+  }
+
+  .dsk-icon .dsk-ico { font-size: 28px; }
+  .dsk-icon .dsk-lbl { font-size: 9px; }
+
+  /* Hide clock widget on mobile */
+  .wzone { display: none !important; }
+
+  /* ── Mobile Taskbar ── */
+  #taskbar {
+    height: 52px;
+    padding: 0 12px;
+  }
+
+  /* Hide BinodOS 3 brand & tabs on mobile */
+  .tb-brand { display: none !important; }
+  .tb-div { display: none !important; }
+  .tb-tabs { display: none !important; }
+
+  /* Show mobile search icon button instead */
+  #mobile-search-btn {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 9px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all .15s;
+    font-size: 16px;
+  }
+  #mobile-search-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Tray adjustments for mobile */
+  .tray { padding: 3px 7px; gap: 6px; }
+  #tray-clk { font-size: 9px; padding: 3px 6px; }
+
+  /* ── Mobile Windows: Full Screen ── */
+  .win {
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100vw !important;
+    height: calc(100vh - 52px) !important;
+    min-width: unset !important;
+    min-height: unset !important;
+    border-radius: 0 !important;
+    z-index: 1000 !important;
+  }
+
+  /* Hide resize handles on mobile */
+  .rhandle { display: none !important; }
+
+  /* Window bar tweaks */
+  .wbar { cursor: default; padding: 8px 12px; }
+  .wdots { gap: 5px; }
+  .wd { width: 14px; height: 14px; }
+  .wtitle { font-size: 11px; }
+
+  /* Scroll area full width */
+  .wscroll { padding: 16px 14px; }
+
+  /* ── Mobile Settings: single column ── */
+  .set-lay {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto 1fr;
+  }
+  .set-nav {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-right: none !important;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+    padding: 8px 4px;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+  .set-nav-i {
+    flex-shrink: 0;
+    flex-direction: column;
+    padding: 6px 10px;
+    font-size: 9px;
+    gap: 3px;
+    border-radius: 8px;
+    border-right: none !important;
+    white-space: nowrap;
+  }
+  .set-nav-i.active {
+    border-right: none !important;
+    border-bottom: 2px solid var(--accent);
+    background: rgba(0,255,136,.06);
+  }
+  .set-nav-i i { font-size: 16px; width: auto; }
+  .set-content { padding: 12px 14px; }
+  .set-row { padding: 8px 10px; gap: 8px; flex-wrap: wrap; }
+  .set-row-l { font-size: 10px; }
+  .rng { width: 80px; }
+
+  /* ── Mobile About: single column ── */
+  .ab-lay { grid-template-columns: 1fr !important; }
+
+  /* ── Mobile Home tweaks ── */
+  .home-hero { grid-template-columns: auto 1fr; gap: 12px; }
+  .home-av { width: 72px; height: 72px; border-radius: 16px; }
+  .home-name { font-size: 20px; }
+  .home-btns { gap: 6px; }
+  .home-btns .btn-p, .home-btns .btn-s { padding: 8px 14px; font-size: 10px; }
+
+  /* ── Mobile connect grid ── */
+  .conn-grid { grid-template-columns: 1fr !important; }
+
+  /* ── Mobile certs ── */
+  .cert-grid { grid-template-columns: 1fr 1fr !important; }
+
+  /* ── Mobile spotlight ── */
+  .sp-box { width: calc(100vw - 24px); border-radius: 12px; }
+  .sp-inp { font-size: 14px; }
+
+  /* ── Mobile context menu ── */
+  .ctx { min-width: 180px; }
+
+  /* ── When window open: hide taskbar ── */
+  #taskbar.hidden-mobile { display: none !important; }
+
+  /* ── Mobile welcome splash ── */
+  .wsplash { display: none !important; }
+
+  /* ── Toast adjust ── */
+  #toast { bottom: 65px; font-size: 10px; }
+}
+
+/* Desktop: hide mobile-only elements */
+#mobile-search-btn { display: none; }
 
 </style>
 </head>
@@ -503,28 +660,23 @@ body{font-family:var(--ui-font);background:var(--bg);color:var(--ui-font-color);
 
 <!-- DESKTOP -->
 <div id="desktop">
-  <div class="wsplash">
-    <div class="ws-title">Welcome.</div>
-    <div class="ws-sub">BinodOS 3.0 · Initializing</div>
-    <div class="ws-bar"><div class="ws-fill"></div></div>
-  </div>
 
   <!-- DESKTOP ICONS -->
   <div id="desktop-icons">
-    <div class="dsk-icon" ondblclick="openWin('home')" onclick="selIcon(this)"><div class="dsk-ico">🏠</div><div class="dsk-lbl">Home</div></div>
-    <div class="dsk-icon" ondblclick="openWin('about')" onclick="selIcon(this)"><div class="dsk-ico">🧠</div><div class="dsk-lbl">About Me</div></div>
-    <div class="dsk-icon" ondblclick="openWin('skills')" onclick="selIcon(this)"><div class="dsk-ico">⚡</div><div class="dsk-lbl">Skills</div></div>
-    <div class="dsk-icon" ondblclick="openWin('projects')" onclick="selIcon(this)"><div class="dsk-ico">🚀</div><div class="dsk-lbl">Projects</div></div>
-    <div class="dsk-icon" ondblclick="openWin('certs')" onclick="selIcon(this)"><div class="dsk-ico">🏆</div><div class="dsk-lbl">Certificates</div></div>
-    <div class="dsk-icon" ondblclick="openWin('connect')" onclick="selIcon(this)"><div class="dsk-ico">📡</div><div class="dsk-lbl">Connect</div></div>
-    <div class="dsk-icon" ondblclick="openWin('terminal')" onclick="selIcon(this)"><div class="dsk-ico">⌨️</div><div class="dsk-lbl">Terminal</div></div>
-    <div class="dsk-icon" ondblclick="openWin('pomodoro')" onclick="selIcon(this)"><div class="dsk-ico">🍅</div><div class="dsk-lbl">Pomodoro</div></div>
-    <div class="dsk-icon" ondblclick="openWin('settings')" onclick="selIcon(this)" style="grid-column:3;"><div class="dsk-ico">⚙️</div><div class="dsk-lbl">Settings</div></div>
-    <div class="dsk-icon" ondblclick="openWin('calc')" onclick="selIcon(this)"><div class="dsk-ico">🧮</div><div class="dsk-lbl">Calculator</div></div>
-    <div class="dsk-icon" ondblclick="showResDialog()" onclick="selIcon(this)"><div class="dsk-ico">📄</div><div class="dsk-lbl">Resume</div></div>
+    <div class="dsk-icon" ondblclick="openWin('home')" onclick="handleIconClick(event,'home',this)"><div class="dsk-ico">🏠</div><div class="dsk-lbl">Home</div></div>
+    <div class="dsk-icon" ondblclick="openWin('about')" onclick="handleIconClick(event,'about',this)"><div class="dsk-ico">🧠</div><div class="dsk-lbl">About Me</div></div>
+    <div class="dsk-icon" ondblclick="openWin('skills')" onclick="handleIconClick(event,'skills',this)"><div class="dsk-ico">⚡</div><div class="dsk-lbl">Skills</div></div>
+    <div class="dsk-icon" ondblclick="openWin('projects')" onclick="handleIconClick(event,'projects',this)"><div class="dsk-ico">🚀</div><div class="dsk-lbl">Projects</div></div>
+    <div class="dsk-icon" ondblclick="openWin('certs')" onclick="handleIconClick(event,'certs',this)"><div class="dsk-ico">🏆</div><div class="dsk-lbl">Certs</div></div>
+    <div class="dsk-icon" ondblclick="openWin('connect')" onclick="handleIconClick(event,'connect',this)"><div class="dsk-ico">📡</div><div class="dsk-lbl">Connect</div></div>
+    <div class="dsk-icon dsk-desktop-only" ondblclick="openWin('terminal')" onclick="handleIconClick(event,'terminal',this)"><div class="dsk-ico">⌨️</div><div class="dsk-lbl">Terminal</div></div>
+    <div class="dsk-icon" ondblclick="openWin('pomodoro')" onclick="handleIconClick(event,'pomodoro',this)"><div class="dsk-ico">🍅</div><div class="dsk-lbl">Pomodoro</div></div>
+    <div class="dsk-icon" ondblclick="openWin('settings')" onclick="handleIconClick(event,'settings',this)"><div class="dsk-ico">⚙️</div><div class="dsk-lbl">Settings</div></div>
+    <div class="dsk-icon" ondblclick="openWin('calc')" onclick="handleIconClick(event,'calc',this)"><div class="dsk-ico">🧮</div><div class="dsk-lbl">Calc</div></div>
+    <div class="dsk-icon" ondblclick="showResDialog()" onclick="handleIconClick(event,'resume-dlg',this)"><div class="dsk-ico">📄</div><div class="dsk-lbl">Resume</div></div>
   </div>
 
-  <!-- CLOCK WIDGET only -->
+  <!-- CLOCK WIDGET (desktop only) -->
   <div class="wzone" id="wzone">
     <div class="widget" id="w-clk">
       <div class="wt">System Time</div>
@@ -534,11 +686,12 @@ body{font-family:var(--ui-font);background:var(--bg);color:var(--ui-font-color);
   </div>
 </div>
 
-
 <!-- TASKBAR -->
 <div id="taskbar" style="display:none;">
   <div class="tb-left">
     <button class="tb-brand" onclick="openSpotlight()">⌘ BinodOS 3</button>
+    <!-- Mobile search icon -->
+    <button id="mobile-search-btn" onclick="openSpotlight()"><i class="ri-search-line"></i></button>
     <div class="tb-div"></div>
     <div class="tb-tabs" id="tbtabs"></div>
   </div>
@@ -565,6 +718,33 @@ body{font-family:var(--ui-font);background:var(--bg);color:var(--ui-font-color);
 </div>
 
 <script>
+// ═══ MOBILE DETECTION ═══
+const isMobile = () => window.innerWidth <= 768;
+
+// ═══ ICON SINGLE-TAP for mobile, double-click for desktop ═══
+let lastTap = {};
+function handleIconClick(e, id, el) {
+  if (isMobile()) {
+    // Single tap opens on mobile
+    e.preventDefault();
+    selIcon(el);
+    if (id === 'resume-dlg') { showResDialog(); return; }
+    openWin(id);
+  } else {
+    // Desktop: just select
+    selIcon(el);
+  }
+}
+
+// Hide terminal icon on mobile
+function applyMobileIconHiding() {
+  const termIcon = document.querySelector('.dsk-desktop-only');
+  if (termIcon) {
+    termIcon.style.display = isMobile() ? 'none' : 'flex';
+  }
+}
+window.addEventListener('resize', applyMobileIconHiding);
+
 // ═══════════════════════════════════════
 // BG CANVAS
 // ═══════════════════════════════════════
@@ -605,7 +785,6 @@ const WPS=[
   {id:'cyber',label:'Cyber',value:'linear-gradient(135deg,#000408 0%,#000e1c 40%,#000a15 100%)',preview:'linear-gradient(135deg,#000408,#000e1c,#000a15)'},
   {id:'crimson',label:'Crimson',value:'linear-gradient(135deg,#0a0205 0%,#1a0208 30%,#1a0505 60%,#0a0202 100%)',preview:'linear-gradient(135deg,#0a0205,#1a0208,#0a0202)'},
 ];
-// ── CHANGE: default wallpaper is now 'sunset' ──
 let curWP='sunset',customWP='',wpBlur=0,wpBright=1,wpOpacity=1;
 function applyWP(id,url){
   curWP=id;const el=document.getElementById('wp-img');
@@ -620,7 +799,6 @@ function applyWPFX(){
   const f=[];if(wpBlur>0)f.push(`blur(${wpBlur}px)`);if(wpBright!==1)f.push(`brightness(${wpBright})`);
   el.style.filter=f.join(' ');el.style.opacity=wpOpacity;
 }
-// Apply sunset wallpaper immediately on page load
 applyWP('sunset','');
 
 // ═══════════════════════════════════════
@@ -643,14 +821,20 @@ function doLogin(){
       document.getElementById('login').style.display='none';
       document.getElementById('desktop').style.display='block';
       document.getElementById('taskbar').style.display='flex';
-      spawnParticles();updTray();startStats();startWClk();
+      applyMobileIconHiding();
+      if(!isMobile()) spawnParticles();
+      updTray();startStats();startWClk();
       const sw=sessionStorage.getItem('bos-wp');
       if(sw){const d=JSON.parse(sw);applyWP(d.id,d.url);customWP=d.url||'';}
-      else{applyWP('sunset','');}  // default to sunset if no saved preference
+      else{applyWP('sunset','');}
       const sa=sessionStorage.getItem('bos-accent');if(sa)setAccentDirect(sa);
-      // restore font settings
       const sf=sessionStorage.getItem('bos-font');if(sf){const fd=JSON.parse(sf);applyFontSettings(fd.family,fd.weight,fd.color);}
-      setTimeout(()=>showToast('🚀 Welcome back, Binod!'),700);
+      if(isMobile()){
+        setTimeout(()=>showToast('👆 Tap once to open'),700);
+      } else {
+        setTimeout(()=>showToast('🚀 Welcome back, Binod!'),700);
+        setTimeout(()=>{openWin('home');},4000);
+      }
     },650);
   } else {
     e.textContent='✗ Incorrect. Hint: "binod"';
@@ -672,6 +856,16 @@ document.addEventListener('click',e=>{
 });
 
 // ═══════════════════════════════════════
+// TASKBAR HIDE/SHOW ON MOBILE WINDOW OPEN
+// ═══════════════════════════════════════
+function hideTaskbarMobile() {
+  if (isMobile()) document.getElementById('taskbar').classList.add('hidden-mobile');
+}
+function showTaskbarMobile() {
+  if (isMobile()) document.getElementById('taskbar').classList.remove('hidden-mobile');
+}
+
+// ═══════════════════════════════════════
 // LOCK
 // ═══════════════════════════════════════
 function showLock(){const l=document.getElementById('lock');l.classList.add('show');updLockClk();}
@@ -691,13 +885,11 @@ let calDate=new Date();
 function toggleCalendar(){
   const p=document.getElementById('cal-popup');
   if(p.classList.contains('open')){p.classList.remove('open');return;}
-  calDate=new Date();
-  renderCal();
-  // position above tray clock
+  calDate=new Date();renderCal();
   const clk=document.getElementById('tray-clk');
   const rect=clk.getBoundingClientRect();
-  p.style.right=(window.innerWidth-rect.right)+'px';
-  p.style.bottom=(window.innerHeight-rect.top+8)+'px';
+  if(isMobile()){p.style.right='8px';p.style.bottom=(window.innerHeight-rect.top+8)+'px';}
+  else{p.style.right=(window.innerWidth-rect.right)+'px';p.style.bottom=(window.innerHeight-rect.top+8)+'px';}
   p.classList.add('open');
 }
 function calNav(dir){calDate.setMonth(calDate.getMonth()+dir);renderCal();}
@@ -711,14 +903,8 @@ function renderCal(){
   const first=new Date(yr,mo,1).getDay();
   const last=new Date(yr,mo+1,0).getDate();
   const prevLast=new Date(yr,mo,0).getDate();
-  // prev month
   for(let i=first-1;i>=0;i--)html+=`<div class="cal-day other-month">${prevLast-i}</div>`;
-  // current month
-  for(let d=1;d<=last;d++){
-    const isToday=d===today.getDate()&&mo===today.getMonth()&&yr===today.getFullYear();
-    html+=`<div class="cal-day${isToday?' today':''}">${d}</div>`;
-  }
-  // next month fill
+  for(let d=1;d<=last;d++){const isToday=d===today.getDate()&&mo===today.getMonth()&&yr===today.getFullYear();html+=`<div class="cal-day${isToday?' today':''}">${d}</div>`;}
   const total=first+last;const rem=total%7?7-(total%7):0;
   for(let d=1;d<=rem;d++)html+=`<div class="cal-day other-month">${d}</div>`;
   grid.innerHTML=html;
@@ -732,7 +918,6 @@ document.addEventListener('click',e=>{
 // FONT SETTINGS
 // ═══════════════════════════════════════
 let pendingFont={family:"'JetBrains Mono',monospace",weight:'400',color:'#ddeeff'};
-
 function applyFontSettings(family,weight,color){
   document.documentElement.style.setProperty('--ui-font',family);
   document.documentElement.style.setProperty('--ui-font-weight',weight);
@@ -800,32 +985,33 @@ function doLogout(){
   document.getElementById('tbtabs').innerHTML='';
   document.getElementById('pwd').value='';
   document.getElementById('lerr').textContent='';
+  showTaskbarMobile();
   const ls=document.getElementById('login');ls.style.display='flex';ls.classList.remove('hide');
 }
 
 // ═══════════════════════════════════════
-// SPOTLIGHT
+// SPOTLIGHT — removes weather & terminal on mobile
 // ═══════════════════════════════════════
 const SITEMS=[
-  {ico:'🏠',lbl:'Home',sub:'Main introduction',fn:()=>openWin('home')},
-  {ico:'🧠',lbl:'About Me',sub:'Education, experience & achievements',fn:()=>openWin('about')},
-  {ico:'⚡',lbl:'Skills',sub:'Technologies & tools',fn:()=>openWin('skills')},
-  {ico:'🚀',lbl:'Projects',sub:'Scam AI, Resume Builder & more',fn:()=>openWin('projects')},
-  {ico:'🏆',lbl:'Certificates',sub:'Kaggle, Google & more',fn:()=>openWin('certs')},
-  {ico:'📡',lbl:'Connect',sub:'Get in touch',fn:()=>openWin('connect')},
-  {ico:'📄',lbl:'Resume',sub:'View or download',fn:()=>showResDialog()},
-  {ico:'⌨️',lbl:'Terminal',sub:'Interactive command line',fn:()=>openWin('terminal')},
-  {ico:'🌤️',lbl:'Weather',sub:'Gandhinagar forecast',fn:()=>openWin('weather')},
-  {ico:'🍅',lbl:'Pomodoro Timer',sub:'Focus & productivity',fn:()=>openWin('pomodoro')},
-  {ico:'🧮',lbl:'Calculator',sub:'Built-in calculator',fn:()=>openWin('calc')},
-  {ico:'⚙️',lbl:'Settings',sub:'Appearance, wallpaper & more',fn:()=>openWin('settings')},
-  {ico:'🔒',lbl:'Lock Screen',sub:'Lock BinodOS',fn:()=>showLock()},
-  {ico:'🚪',lbl:'Sign Out',sub:'Return to login',fn:()=>showLogout()},
+  {ico:'🏠',lbl:'Home',sub:'Main introduction',fn:()=>openWin('home'),mobileHide:false},
+  {ico:'🧠',lbl:'About Me',sub:'Education, experience & achievements',fn:()=>openWin('about'),mobileHide:false},
+  {ico:'⚡',lbl:'Skills',sub:'Technologies & tools',fn:()=>openWin('skills'),mobileHide:false},
+  {ico:'🚀',lbl:'Projects',sub:'Scam AI, Resume Builder & more',fn:()=>openWin('projects'),mobileHide:false},
+  {ico:'🏆',lbl:'Certificates',sub:'Kaggle, Google & more',fn:()=>openWin('certs'),mobileHide:false},
+  {ico:'📡',lbl:'Connect',sub:'Get in touch',fn:()=>openWin('connect'),mobileHide:false},
+  {ico:'📄',lbl:'Resume',sub:'View or download',fn:()=>showResDialog(),mobileHide:false},
+  {ico:'⌨️',lbl:'Terminal',sub:'Interactive command line',fn:()=>openWin('terminal'),mobileHide:true},
+  {ico:'🌤️',lbl:'Weather',sub:'Gandhinagar forecast',fn:()=>openWin('weather'),mobileHide:true},
+  {ico:'🍅',lbl:'Pomodoro Timer',sub:'Focus & productivity',fn:()=>openWin('pomodoro'),mobileHide:false},
+  {ico:'🧮',lbl:'Calculator',sub:'Built-in calculator',fn:()=>openWin('calc'),mobileHide:false},
+  {ico:'⚙️',lbl:'Settings',sub:'Appearance, wallpaper & more',fn:()=>openWin('settings'),mobileHide:false},
+  {ico:'🔒',lbl:'Lock Screen',sub:'Lock BinodOS',fn:()=>showLock(),mobileHide:false},
+  {ico:'🚪',lbl:'Sign Out',sub:'Return to login',fn:()=>showLogout(),mobileHide:false},
 ];
 function openSpotlight(){
   const ex=document.getElementById('spotlight');if(ex){ex.remove();return;}
   const el=document.createElement('div');el.id='spotlight';
-  el.style.cssText='position:fixed;inset:0;z-index:15000;display:flex;align-items:flex-start;justify-content:center;padding-top:90px;background:rgba(0,0,0,.65);backdrop-filter:blur(14px);animation:fadeIn .14s ease;';
+  el.style.cssText='position:fixed;inset:0;z-index:15000;display:flex;align-items:flex-start;justify-content:center;padding-top:'+( isMobile()?'40px':'90px')+';background:rgba(0,0,0,.65);backdrop-filter:blur(14px);animation:fadeIn .14s ease;';
   el.innerHTML=`<div class="sp-box"><div class="sp-row"><i class="ri-search-line"></i><input class="sp-inp" id="sp-inp" placeholder="Search apps & commands…" autocomplete="off"/><span style="font-size:9px;color:var(--muted2)">ESC</span></div><div class="sp-results" id="sp-res"></div></div>`;
   document.body.appendChild(el);
   el.addEventListener('click',e=>{if(e.target===el)el.remove();});
@@ -833,7 +1019,11 @@ function openSpotlight(){
   window._spFn=i=>{SITEMS[i].fn();document.getElementById('spotlight')?.remove();};
   function render(q){
     const res=document.getElementById('sp-res');
-    const filtered=q?SITEMS.map((item,i)=>({item,i})).filter(({item})=>item.lbl.toLowerCase().includes(q)||item.sub.toLowerCase().includes(q)):SITEMS.map((item,i)=>({item,i}));
+    const mobile=isMobile();
+    const filtered=SITEMS
+      .map((item,i)=>({item,i}))
+      .filter(({item})=>!mobile||!item.mobileHide)
+      .filter(({item})=>!q||item.lbl.toLowerCase().includes(q)||item.sub.toLowerCase().includes(q));
     if(!filtered.length){res.innerHTML='<div style="padding:18px;text-align:center;font-size:10px;color:var(--muted)">No results</div>';return;}
     res.innerHTML=`<div class="sp-grp"><div class="sp-grp-l">Applications & Commands</div>${filtered.map(({item,i})=>`<div class="sp-result" onclick="_spFn(${i})"><div class="sr-ico">${item.ico}</div><div><div class="sr-lbl">${item.lbl}</div><div class="sr-sub">${item.sub}</div></div><div class="sr-kbd">↵</div></div>`).join('')}</div>`;
   }
@@ -893,7 +1083,10 @@ function openWin(id){
   el.addEventListener('mousedown',()=>bringFront(id));
   document.getElementById('desktop').appendChild(el);
   wins[id]={el,min:false,max:false,_prev:null};
-  bringFront(id);addPill(id,def.title);
+  bringFront(id);
+  if(!isMobile()) addPill(id,def.title);
+  // Hide taskbar on mobile when window opens
+  hideTaskbarMobile();
   setTimeout(()=>{
     if(id==='terminal')termInit(id);
     if(id==='calc')calcInit();
@@ -933,7 +1126,6 @@ function buildHome(){return `
     <button class="btn-p" onclick="openWin('projects')">View Projects →</button>
     <button class="btn-s" onclick="openWin('connect')">📡 Get In Touch</button>
     <button class="btn-s" onclick="openWin('skills')">⚡ Skills</button>
-    <button class="btn-s" onclick="openWin('terminal')">⌨️ Terminal</button>
   </div>
   <div class="home-stats">
     <div class="hs"><div class="hs-v">9.17</div><div class="hs-l">GPA / 10</div></div>
@@ -1007,7 +1199,8 @@ function buildSkills(){
       <div class="sk-pill" style="flex-direction:column;align-items:flex-start;min-width:130px;">
         <div style="display:flex;align-items:center;gap:5px;"><span class="sk-ico">${s.ico}</span><span class="sk-name">${s.n}</span></div>
         <div class="sk-bar-w"><div class="sk-bar" style="width:${s.pct}%;background:linear-gradient(90deg,var(--accent),var(--blue));"></div></div>
-      </div>`).join('')}</div></div>`).join('')}`;}
+      </div>`).join('')}</div></div>`).join('')}`;
+}
 
 // ── PROJECTS ──
 function buildProjects(){return `
@@ -1078,7 +1271,6 @@ function buildTermHTML(id){return `<div class="term-body" onclick="document.getE
     <span class="term-prompt">binod@portfolio:~$</span>
     <input class="term-inp" id="ti-${id}" type="text" autocomplete="off" spellcheck="false" placeholder="type 'help'…" onkeydown="termKD(event,'${id}')"/>
   </div></div>`;}
-
 const THIST={};
 const JOKES=['Why do programmers prefer dark mode? Because light attracts bugs! 🐛','How many programmers to change a light bulb? None — it\'s a hardware problem.','A SQL query walks into a bar and asks two tables: "Can I JOIN you?"','Why was the JavaScript developer sad? Didn\'t know how to null feelings.','Why do Java developers wear glasses? Because they can\'t C#.'];
 function termInit(id){
@@ -1139,8 +1331,7 @@ function termRun(id,raw){
       `<span class="t-p">  ╚══════════════════════════════╝ </span>`,``,
       `  <span class="t-m">Stack  :</span> <span class="t-w">MERN · Python · AWS · Tailwind</span>`,
       `  <span class="t-m">AI/ML  :</span> <span class="t-w">NLP · Groq · n8n · Prompt Eng</span>`,``],
-    ls:()=>[``,`<span class="t-y">~/portfolio/</span>`,
-      `  <span class="t-g">home</span>  <span class="t-g">about</span>  <span class="t-g">skills</span>  <span class="t-g">projects</span>  <span class="t-g">certs</span>  <span class="t-g">connect</span>`,``],
+    ls:()=>[``,`<span class="t-y">~/portfolio/</span>`,`  <span class="t-g">home</span>  <span class="t-g">about</span>  <span class="t-g">skills</span>  <span class="t-g">projects</span>  <span class="t-g">certs</span>  <span class="t-g">connect</span>`,``],
     open:()=>{
       const valid=['home','about','skills','projects','certs','connect','resume','terminal','weather','pomodoro','calc','settings'];
       if(!arg)return[`<span class="t-r">Usage: open &lt;section&gt;</span>`,``];
@@ -1186,15 +1377,7 @@ function termRun(id,raw){
 // ═══════════════════════════════════════
 // WEATHER APP
 // ═══════════════════════════════════════
-const WEATHER_DATA={
-  current:{temp:29,icon:'⛅',desc:'Partly Cloudy',humidity:62,wind:12,uv:7,feels:32},
-  forecast:[
-    {day:'Mon',icon:'☀️',hi:34,lo:22},{day:'Tue',icon:'⛅',hi:31,lo:21},
-    {day:'Wed',icon:'🌧️',hi:26,lo:19},{day:'Thu',icon:'⛅',hi:29,lo:20},
-    {day:'Fri',icon:'☀️',hi:35,lo:23},{day:'Sat',icon:'🌤️',hi:32,lo:21},
-    {day:'Sun',icon:'☀️',hi:36,lo:24},
-  ]
-};
+const WEATHER_DATA={current:{temp:29,icon:'⛅',desc:'Partly Cloudy',humidity:62,wind:12,uv:7,feels:32},forecast:[{day:'Mon',icon:'☀️',hi:34,lo:22},{day:'Tue',icon:'⛅',hi:31,lo:21},{day:'Wed',icon:'🌧️',hi:26,lo:19},{day:'Thu',icon:'⛅',hi:29,lo:20},{day:'Fri',icon:'☀️',hi:35,lo:23},{day:'Sat',icon:'🌤️',hi:32,lo:21},{day:'Sun',icon:'☀️',hi:36,lo:24}]};
 function buildWeatherHTML(){return `<div class="wx-body">
   <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Gandhinagar, Gujarat · IN</div>
   <div class="wx-hero">
@@ -1212,14 +1395,7 @@ function buildWeatherHTML(){return `<div class="wx-body">
   </div>
   <div class="wx-forecast">
     <div class="wx-fc-ttl">7-Day Forecast</div>
-    <div class="wx-fc-row">
-      ${WEATHER_DATA.forecast.map(f=>`<div class="wx-fc-day">
-        <div class="wx-fc-day-n">${f.day}</div>
-        <div class="wx-fc-ico">${f.icon}</div>
-        <div class="wx-fc-hi">${f.hi}°</div>
-        <div class="wx-fc-lo">${f.lo}°</div>
-      </div>`).join('')}
-    </div>
+    <div class="wx-fc-row">${WEATHER_DATA.forecast.map(f=>`<div class="wx-fc-day"><div class="wx-fc-day-n">${f.day}</div><div class="wx-fc-ico">${f.icon}</div><div class="wx-fc-hi">${f.hi}°</div><div class="wx-fc-lo">${f.lo}°</div></div>`).join('')}</div>
   </div>
   <div style="margin-top:14px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:9px;font-size:9px;color:var(--muted);text-align:center;letter-spacing:1px;">
     📍 Simulated weather data · Last updated: ${new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}
@@ -1268,7 +1444,7 @@ function togglePomo(){
     if(btn)btn.textContent='⏸ Pause';
     pomo.iv=setInterval(()=>{
       pomo.left--;rendPomoTime();rendPomoRing();
-      if(pomo.left<=0){clearInterval(pomo.iv);pomo.running=false;pomo.sessions++;rendPomoSess();showToast('🍅 Session complete! Take a break.');setPomoMode(pomo.sessions%4===0?'long':'short');}
+      if(pomo.left<=0){clearInterval(pomo.iv);pomo.running=false;pomo.sessions++;rendPomoSess();showToast('🍅 Session complete!');setPomoMode(pomo.sessions%4===0?'long':'short');}
     },1000);
   } else {clearInterval(pomo.iv);if(btn)btn.textContent='▶ Resume';}
 }
@@ -1384,10 +1560,7 @@ function setNav(el,p){
   document.querySelectorAll('.set-nav-i').forEach(e=>e.classList.remove('active'));
   el.classList.add('active');rendSetPane(p);
 }
-
-// temp font preview storage (applied only on "Make Changes")
 let tempFont={...pendingFont};
-
 function rendSetPane(p){
   const c=document.getElementById('set-content');if(!c)return;
   if(p==='appearance')c.innerHTML=`
@@ -1418,7 +1591,6 @@ function rendSetPane(p){
       <div class="set-row"><div><div class="set-row-l">Opacity</div></div><input type="range" class="rng" min="0.1" max="1" step="0.05" value="${wpOpacity}" oninput="wpOpacity=this.value;applyWPFX();this.nextElementSibling.textContent=parseFloat(this.value).toFixed(2)"/><span style="font-size:9px;color:var(--muted);min-width:26px">${wpOpacity}</span></div>
     </div>`;
   else if(p==='typography'){
-    // Typography settings pane
     c.innerHTML=`
     <div class="set-sec"><div class="set-sec-t">Font Settings</div>
       <div style="padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:11px;margin-bottom:10px;">
@@ -1452,19 +1624,14 @@ function rendSetPane(p){
       </div>
     </div>
     <div style="margin-top:12px;">
-      <button onclick="applyTypography()" style="background:linear-gradient(135deg,var(--accent),var(--blue));color:#000;border:none;border-radius:10px;padding:10px 24px;font-family:'Syne',sans-serif;font-size:12px;font-weight:800;cursor:pointer;letter-spacing:.5px;transition:all .2s;width:100%;">
-        ✓ Make Changes
-      </button>
+      <button onclick="applyTypography()" style="background:linear-gradient(135deg,var(--accent),var(--blue));color:#000;border:none;border-radius:10px;padding:10px 24px;font-family:'Syne',sans-serif;font-size:12px;font-weight:800;cursor:pointer;letter-spacing:.5px;transition:all .2s;width:100%;">✓ Make Changes</button>
       <div style="text-align:center;margin-top:7px;font-size:9px;color:var(--muted2);">Changes apply to the entire desktop interface</div>
     </div>`;
-    // Set current selections
     setTimeout(()=>{
       const sel=document.getElementById('font-family-sel');
       if(sel){for(let o of sel.options){if(o.value===pendingFont.family){o.selected=true;break;}}}
       const fw=pendingFont.weight||'400';const btn=document.getElementById('fw-'+fw);
       if(btn){btn.style.borderColor='var(--accent)';btn.style.color='var(--accent)';}
-      // mark color swatch
-      document.querySelectorAll('.fc-sw').forEach(s=>{if(s.style.background===pendingFont.color||s.title.includes(pendingFont.color))s.style.borderColor='white';});
       previewFont();
     },10);
   }
@@ -1482,8 +1649,7 @@ function rendSetPane(p){
     </div>`;
   else if(p==='keyboard')c.innerHTML=`
     <div class="set-sec"><div class="set-sec-t">Keyboard Shortcuts</div>
-      ${[['Ctrl/⌘ + K','Open Spotlight Search'],['H','Open Home'],['T','Open Terminal'],['P','Open Projects'],['S','Open Skills'],['C','Open Connect'],['Esc','Close Spotlight / Context Menu'],['Double-click icon','Open application']].map(([k,d])=>`
-        <div class="set-row"><div class="set-row-l">${d}</div><span class="kbd">${k}</span></div>`).join('')}
+      ${[['Ctrl/⌘ + K','Open Spotlight Search'],['H','Open Home'],['T','Open Terminal'],['P','Open Projects'],['S','Open Skills'],['C','Open Connect'],['Esc','Close Spotlight'],['Double-click icon','Open application (Desktop)'],['Single tap','Open application (Mobile)']].map(([k,d])=>`<div class="set-row"><div class="set-row-l">${d}</div><span class="kbd">${k}</span></div>`).join('')}
     </div>`;
   else c.innerHTML=`
     <div class="set-sec">
@@ -1500,15 +1666,11 @@ function rendSetPane(p){
       </div>
     </div>`;
 }
-
-// ── Font preview / selection helpers ──
 function previewFont(){
   const sel=document.getElementById('font-family-sel');if(!sel)return;
   const prev=document.getElementById('font-preview');if(!prev)return;
   tempFont.family=sel.value;
-  prev.style.fontFamily=tempFont.family;
-  prev.style.fontWeight=tempFont.weight||'400';
-  prev.style.color=tempFont.color||'#ddeeff';
+  prev.style.fontFamily=tempFont.family;prev.style.fontWeight=tempFont.weight||'400';prev.style.color=tempFont.color||'#ddeeff';
 }
 function selFontWeight(w){
   tempFont.weight=w;
@@ -1524,9 +1686,8 @@ function selFontColor(col,el){
 }
 function applyTypography(){
   applyFontSettings(tempFont.family,tempFont.weight||'400',tempFont.color||'#ddeeff');
-  showToast('✅ Font settings applied across desktop!');
+  showToast('✅ Font settings applied!');
 }
-
 function handleWPUp(e){
   const file=e.target.files[0];if(!file)return;
   const r=new FileReader();
@@ -1554,10 +1715,16 @@ function bringFront(id){
 function closeWin(id){
   const w=wins[id];if(!w)return;
   w.el.style.animation='winClose .14s ease forwards';w.el.style.pointerEvents='none';
-  setTimeout(()=>{w.el.remove();delete wins[id];document.querySelector(`.tb-pill[data-id="${id}"]`)?.remove();updDockBadges();},140);
+  setTimeout(()=>{
+    w.el.remove();delete wins[id];
+    document.querySelector(`.tb-pill[data-id="${id}"]`)?.remove();
+    updDockBadges();
+    // Show taskbar again if no windows open
+    if(Object.keys(wins).length===0) showTaskbarMobile();
+  },140);
 }
-function minWin(id){const w=wins[id];if(!w)return;w.el.classList.add('minimized');w.min=true;document.querySelector(`.tb-pill[data-id="${id}"]`)?.classList.remove('active');}
-function unmin(id){const w=wins[id];if(!w)return;w.el.classList.remove('minimized');w.min=false;bringFront(id);}
+function minWin(id){const w=wins[id];if(!w)return;w.el.classList.add('minimized');w.min=true;document.querySelector(`.tb-pill[data-id="${id}"]`)?.classList.remove('active');showTaskbarMobile();}
+function unmin(id){const w=wins[id];if(!w)return;w.el.classList.remove('minimized');w.min=false;bringFront(id);hideTaskbarMobile();}
 function maxWin(id){
   const w=wins[id];if(!w)return;
   if(w.max){w.el.style.left=w._px;w.el.style.top=w._py;w.el.style.width=w._pw;w.el.style.height=w._ph;w.el.style.borderRadius='';w.max=false;}
@@ -1575,9 +1742,10 @@ function updDockBadges(){
 }
 
 // ═══════════════════════════════════════
-// DRAG & RESIZE
+// DRAG & RESIZE (desktop only)
 // ═══════════════════════════════════════
 function startDrag(e,id){
+  if(isMobile())return;
   if(e.target.closest('.wd'))return;
   const win=document.getElementById('w-'+id);if(wins[id]?.max)return;
   const sx=e.clientX-win.offsetLeft,sy=e.clientY-win.offsetTop;
@@ -1586,6 +1754,7 @@ function startDrag(e,id){
   document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);
 }
 function startResize(e,id,dir){
+  if(isMobile())return;
   e.preventDefault();e.stopPropagation();
   const win=document.getElementById('w-'+id);if(wins[id]?.max)return;
   const sx=e.clientX,sy=e.clientY,sw=win.offsetWidth,sh=win.offsetHeight;
@@ -1598,28 +1767,42 @@ function startResize(e,id,dir){
 }
 
 // ═══════════════════════════════════════
-// CONTEXT MENU — only 6 most important
+// CONTEXT MENU — mobile excludes terminal
 // ═══════════════════════════════════════
 let ctxEl=null;
 function closeCtx(){if(ctxEl){ctxEl.remove();ctxEl=null;}}
 document.getElementById('desktop').addEventListener('contextmenu',e=>{
   if(e.target.closest('.win')||e.target.closest('.di'))return;
   e.preventDefault();closeCtx();
+  const mobile=isMobile();
   const m=document.createElement('div');m.className='ctx';
   const maxH=window.innerHeight-20;const topPos=Math.min(e.clientY,maxH-260);
   m.style.cssText=`left:${Math.min(e.clientX,window.innerWidth-210)}px;top:${Math.max(0,topPos)}px;`;
   m.innerHTML=`
     <div class="ctx-i" onclick="openWin('home')"><i class="ri-home-line"></i>Home<span class="ckbd">H</span></div>
     <div class="ctx-i" onclick="openWin('projects')"><i class="ri-code-box-line"></i>Projects<span class="ckbd">P</span></div>
-    <div class="ctx-i" onclick="openWin('terminal')"><i class="ri-terminal-box-line"></i>Terminal<span class="ckbd">T</span></div>
+    ${mobile?'':`<div class="ctx-i" onclick="openWin('terminal')"><i class="ri-terminal-box-line"></i>Terminal<span class="ckbd">T</span></div>`}
     <div class="ctx-sep"></div>
-    <div class="ctx-i" onclick="openSpotlight()"><i class="ri-search-line"></i>Spotlight<span class="ckbd">⌘K</span></div>
+    <div class="ctx-i" onclick="openSpotlight()"><i class="ri-search-line"></i>Search<span class="ckbd">⌘K</span></div>
     <div class="ctx-i" onclick="openWin('settings')"><i class="ri-settings-4-line"></i>Settings</div>
     <div class="ctx-sep"></div>
     <div class="ctx-i danger" onclick="showLogout()"><i class="ri-logout-box-line"></i>Sign Out</div>`;
   document.body.appendChild(m);ctxEl=m;
   setTimeout(()=>document.addEventListener('click',closeCtx,{once:true}),50);
 });
+
+// Long-press for context menu on mobile
+let longPressTimer=null;
+document.getElementById('desktop').addEventListener('touchstart',e=>{
+  if(e.target.closest('.win')||e.target.closest('.dsk-icon'))return;
+  const touch=e.touches[0];
+  longPressTimer=setTimeout(()=>{
+    const fakeEvent={clientX:touch.clientX,clientY:touch.clientY,preventDefault:()=>{},target:e.target};
+    document.getElementById('desktop').dispatchEvent(Object.assign(new Event('contextmenu'),fakeEvent));
+  },600);
+},{passive:true});
+document.getElementById('desktop').addEventListener('touchend',()=>{clearTimeout(longPressTimer);},{passive:true});
+document.getElementById('desktop').addEventListener('touchmove',()=>{clearTimeout(longPressTimer);},{passive:true});
 
 // ═══════════════════════════════════════
 // TOAST
@@ -1645,8 +1828,12 @@ document.addEventListener('keydown',e=>{
   else if(e.key==='Escape')closeCtx();
 });
 
-// AUTO OPEN HOME on boot
-setTimeout(()=>{if(document.getElementById('desktop').style.display==='block')openWin('home');},4000);
+// Resize handler to reapply icon visibility
+window.addEventListener('resize', ()=>{
+  applyMobileIconHiding();
+  // Close all windows and show taskbar when switching to desktop
+  if(!isMobile()) showTaskbarMobile();
+});
 </script>
 </body>
 </html>
