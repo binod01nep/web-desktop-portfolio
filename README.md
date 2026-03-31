@@ -1,4 +1,4 @@
-# 🖥️ BinodOS — Portfolio OS(for desktop users only)
+# 🖥️ BinodOS — Portfolio OS(for desktop and mobile users)
 
 > An interactive, OS-themed personal portfolio built entirely with **HTML · CSS · Vanilla JS** — no frameworks, no dependencies.
 
